@@ -833,21 +833,17 @@
     }
 
     // Dynamic Asset Age Calculator based on Thai B.E. Format
-    // Thai year 2569 B.E. corresponds to current local year 2026 A.D.
     function getAssetAgeInfo(assetId) {
       if (!assetId) return null;
-      // Search for the first two-digit number in the string (represents B.E. short year, e.g. 57, 63, 68)
       const match = assetId.match(/(\d{2})/);
       if (match) {
         const yrShort = parseInt(match[1]);
         if (yrShort > 0) {
-          // Generally B.E. years are in the range 2500+ (e.g. 57 -> 2557)
-          // For older assets, could be 24xx or we handle cases
           let beYear = (yrShort >= 30 && yrShort <= 99) ? (2500 + yrShort) : (2500 + yrShort);
           if (yrShort < 30) {
-            beYear = 2500 + yrShort; // e.g. 10 -> 2510, or 2569
+            beYear = 2500 + yrShort;
           }
-          const currentBeYear = 2569; // Year 2026 is B.E. 2569
+          const currentBeYear = 2569;
           const age = currentBeYear - beYear;
           return {
             beYear: beYear,
@@ -899,7 +895,6 @@
     function setQuickFilter(mode) {
       activeFilter = mode;
       
-      // Update active state on filter buttons
       document.querySelectorAll(".quick-filters .btn").forEach(btn => {
         btn.classList.remove("btn-primary");
         btn.classList.add("btn-secondary");
@@ -941,13 +936,9 @@
       const searchTerm = document.getElementById("sheetSearch").value.trim().toLowerCase();
       const headers = sheet.headers;
       
-      // 1. First Pass: Filter by search and quick filters
       let rows = sheet.data;
-      
-      // Filter out empty rows or non-objects
       rows = rows.filter(r => r && (r._type === "category" || typeof r === "object"));
       
-      // Apply Search Filter
       if (searchTerm) {
         rows = rows.filter(r => {
           if (r._type === "category") return false;
@@ -955,7 +946,6 @@
         });
       }
       
-      // Apply Quick Filter (over10, broken, working)
       if (activeFilter === "over10") {
         rows = rows.filter(r => {
           if (r._type === "category") return false;
@@ -984,17 +974,14 @@
         });
       }
       
-      // Render Summary Dashboard Grid Metrics
       calculateGlobalStats();
       
-      // Render Table
       const container = document.getElementById("activeTableContainer");
       if (rows.length === 0) {
         container.innerHTML = `<div class="empty"><i class="fa-regular fa-face-frown"></i> ไม่พบข้อมูลที่ตรงกับเงื่อนไข</div>`;
         return;
       }
       
-      // Re-order headers to place Asset ID, Type, Qty first, and Age column
       let tableHtml = `<table><thead><tr>`;
       headers.forEach(h => {
         tableHtml += `<th>${h}</th>`;
@@ -1016,7 +1003,6 @@
         headers.forEach(h => {
           let val = row[h] || "";
           
-          // Render Status badges with instant click toggle
           if (h === "ใช้งานได้" || h === "ใช้ได้" || h === "ใช้งานไม่ได้" || h.includes("สถานะ")) {
             let working = (val === "ใช้งานได้" || val === "ใช้ได้" || val === "1" || val === "OK");
             let broken = (val === "ใช้งานไม่ได้" || val === "0" || val === "ชำรุด");
@@ -1034,7 +1020,6 @@
           }
         });
         
-        // Age calculation column
         const ageInfo = getAssetAgeInfo(row["เลขครุภัณฑ์"]);
         let ageHtml = `<td>—</td>`;
         if (ageInfo) {
@@ -1048,7 +1033,6 @@
         }
         tableHtml += ageHtml;
         
-        // Image Cell with uploader preview
         const recordKey = `${activeSheet}_${row["ลำดับ"] || rIdx}_${row["เลขครุภัณฑ์"] || ""}`;
         const storedImg = await getImage(recordKey);
         
@@ -1068,7 +1052,6 @@
         }
         tableHtml += `<td>${imgHtml}</td>`;
         
-        // Actions cell
         tableHtml += `<td>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="openEditModal(${rIdx})"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
@@ -1097,13 +1080,11 @@
           if (!r || r._type === "category") return;
           totalCount++;
           
-          // Age calc
           const ageInfo = getAssetAgeInfo(r["เลขครุภัณฑ์"]);
           if (ageInfo && ageInfo.age >= 10) {
             over10Count++;
           }
           
-          // Status calc
           Object.keys(r).forEach(k => {
             if (k === "ใช้งานได้" || k === "ใช้ได้") {
               if (r[k] === "ใช้งานได้" || r[k] === "ใช้ได้" || r[k] === "1" || r[k] === "OK") workingCount++;
@@ -1159,7 +1140,6 @@
       let over10 = 0;
       
       normalRows.forEach(r => {
-        // Status Check
         Object.keys(r).forEach(k => {
           if (k === "ใช้งานได้" || k === "ใช้ได้") {
             if (r[k] === "ใช้งานได้" || r[k] === "ใช้ได้" || r[k] === "1" || r[k] === "OK") working++;
@@ -1167,7 +1147,6 @@
           }
         });
         
-        // Age Check
         const ageInfo = getAssetAgeInfo(r["เลขครุภัณฑ์"]);
         if (ageInfo && ageInfo.age >= 10) over10++;
       });
@@ -1185,10 +1164,6 @@
         html += `<span class="chip" style="color:#ff6b6b; border-color:rgba(248, 81, 73, 0.35);"><i class="fa-solid fa-triangle-exclamation"></i> เสื่อมสภาพ (>10 ปี): ${over10}</span>`;
       }
       bar.innerHTML = html;
-    }
-
-    function handleSearch() {
-      renderActiveSheet();
     }
 
     // IMAGE UPLOAD IMPLEMENTATION
@@ -1240,10 +1215,44 @@
       let formHtml = ``;
       headers.forEach(h => {
         let val = record[h] || "";
+        let inputHtml = "";
+        
+        const isWorkingCol = (h === "ใช้งานได้" || h === "ใช้ได้");
+        const isBrokenCol = (h === "ใช้งานไม่ได้");
+        const isStatusCol = h.includes("สถานะ");
+        
+        if (isWorkingCol) {
+          const currentVal = val.trim();
+          inputHtml = `
+            <select id="form_${h}" class="form-control">
+              <option value="" ${currentVal === "" ? "selected" : ""}>— (ไม่มีข้อมูล)</option>
+              <option value="${h}" ${currentVal !== "" ? "selected" : ""}>ใช้งานได้ (OK)</option>
+            </select>
+          `;
+        } else if (isBrokenCol) {
+          const currentVal = val.trim();
+          inputHtml = `
+            <select id="form_${h}" class="form-control">
+              <option value="" ${currentVal === "" ? "selected" : ""}>— (ไม่มีข้อมูล)</option>
+              <option value="${h}" ${currentVal !== "" ? "selected" : ""}>ชำรุด/เสีย (Broken)</option>
+            </select>
+          `;
+        } else if (isStatusCol) {
+          inputHtml = `
+            <select id="form_${h}" class="form-control">
+              <option value="ใช้งานได้" ${val.includes("ได้") || val.includes("ปกติ") || val.includes("OK") || val === "1" ? "selected" : ""}>ใช้งานได้</option>
+              <option value="ใช้งานไม่ได้" ${val.includes("ไม่ได้") || val.includes("ชำรุด") || val.includes("เสีย") || val === "0" ? "selected" : ""}>ใช้งานไม่ได้</option>
+              <option value="ปิดปรับปรุง/สำรอง" ${val.includes("ปรับปรุง") || val.includes("สำรอง") ? "selected" : ""}>ปิดปรับปรุง/สำรอง</option>
+            </select>
+          `;
+        } else {
+          inputHtml = `<input type="text" id="form_${h}" class="form-control" value="${val.replace(/"/g, '&quot;')}">`;
+        }
+        
         formHtml += `
           <div class="form-group">
             <label>${h}</label>
-            <input type="text" id="form_${h}" class="form-control" value="${val.replace(/"/g, '&quot;')}">
+            ${inputHtml}
           </div>
         `;
       });
@@ -1263,10 +1272,41 @@
       
       let formHtml = ``;
       headers.forEach(h => {
+        let inputHtml = "";
+        const isWorkingCol = (h === "ใช้งานได้" || h === "ใช้ได้");
+        const isBrokenCol = (h === "ใช้งานไม่ได้");
+        const isStatusCol = h.includes("สถานะ");
+        
+        if (isWorkingCol) {
+          inputHtml = `
+            <select id="form_${h}" class="form-control">
+              <option value="" selected>— (ไม่มีข้อมูล)</option>
+              <option value="${h}">ใช้งานได้ (OK)</option>
+            </select>
+          `;
+        } else if (isBrokenCol) {
+          inputHtml = `
+            <select id="form_${h}" class="form-control">
+              <option value="" selected>— (ไม่มีข้อมูล)</option>
+              <option value="${h}">ชำรุด/เสีย (Broken)</option>
+            </select>
+          `;
+        } else if (isStatusCol) {
+          inputHtml = `
+            <select id="form_${h}" class="form-control">
+              <option value="ใช้งานได้" selected>ใช้งานได้</option>
+              <option value="ใช้งานไม่ได้">ใช้งานไม่ได้</option>
+              <option value="ปิดปรับปรุง/สำรอง">ปิดปรับปรุง/สำรอง</option>
+            </select>
+          `;
+        } else {
+          inputHtml = `<input type="text" id="form_${h}" class="form-control" value="">`;
+        }
+        
         formHtml += `
           <div class="form-group">
             <label>${h}</label>
-            <input type="text" id="form_${h}" class="form-control" value="">
+            ${inputHtml}
           </div>
         `;
       });
