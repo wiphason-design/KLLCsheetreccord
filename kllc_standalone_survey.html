@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLLC AI OS - ระบบ Checklist ครุภัณฑ์ & CCTV</title>
+    <title>KLLC AI OS - ระบบ Checklist ครุภัณฑ์ & CCTV (Location-First)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,16 +15,16 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-emerald-600 p-3 rounded-2xl text-white shadow-lg shadow-emerald-600/30">
-                    <i class="fa-solid fa-clipboard-check text-2xl"></i>
+                    <i class="fa-solid fa-sitemap text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-white tracking-wide">KLLC AI OS — ระบบ Checklist ครุภัณฑ์ & CCTV</h1>
-                    <p class="text-xs text-slate-400">สำนักการเรียนรู้ตลอดชีวิต (KLLC) สจล. | Standalone Mobile Checklist</p>
+                    <h1 class="text-lg font-bold text-white tracking-wide">KLLC AI OS — ระบบ Checklist แยกตามพื้นที่จัดเก็บ</h1>
+                    <p class="text-xs text-slate-400">สำนักการเรียนรู้ตลอดชีวิต (KLLC) สจล. | Location-Bound Asset Audit System</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 flex-wrap">
-                <div class="bg-slate-800/80 px-3.5 py-2 rounded-xl text-xs border border-slate-700">ทั้งหมด: <strong id="total-count" class="text-white font-bold">405</strong></div>
-                <div class="bg-emerald-950/80 border border-emerald-800 px-3.5 py-2 rounded-xl text-xs text-emerald-300"><i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> พร้อมใช้งาน: <strong id="usable-count" class="text-emerald-400 font-bold">405</strong></div>
+                <div class="bg-slate-800/80 px-3.5 py-2 rounded-xl text-xs border border-slate-700">ทั้งหมด: <strong id="total-count" class="text-white font-bold">0</strong></div>
+                <div class="bg-emerald-950/80 border border-emerald-800 px-3.5 py-2 rounded-xl text-xs text-emerald-300"><i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> พร้อมใช้งาน: <strong id="usable-count" class="text-emerald-400 font-bold">0</strong></div>
                 <div class="bg-rose-950/80 border border-rose-800 px-3.5 py-2 rounded-xl text-xs text-rose-300"><i class="fa-solid fa-circle-xmark text-rose-400 mr-1"></i> พบปัญหา: <strong id="unusable-count" class="text-rose-400 font-bold">0</strong></div>
             </div>
         </div>
@@ -48,9 +48,9 @@
                     <input type="date" id="inspection-date" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white text-sm focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">หมวด/โซน (Facility Zone)</label>
-                    <select id="filter-sheet" class="w-full bg-slate-950 border border-slate-800 text-white text-sm rounded-xl px-3.5 py-2 focus:outline-none focus:border-emerald-500">
-                        <option value="all">ทุกโซน/รวม CCTV (405 รายการ)</option>
+                    <label class="block text-xs text-slate-400 mb-1">เลือกโซน / ห้องจัดเก็บ (Location/Room)</label>
+                    <select id="filter-location" class="w-full bg-slate-950 border border-slate-800 text-white text-sm rounded-xl px-3.5 py-2 focus:outline-none focus:border-emerald-500">
+                        <option value="all">ทุกพื้นที่จัดเก็บ</option>
                     </select>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
-                <input type="text" id="search-input" placeholder="ค้นหาชื่ออุปกรณ์, รหัส, CCTV หรือสถานที่..." 
+                <input type="text" id="search-input" placeholder="ค้นหาชื่ออุปกรณ์, รหัสครุภัณฑ์, หรือสถานที่..." 
                     class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-sm">
             </div>
 
@@ -78,27 +78,23 @@
             </div>
         </div>
 
-        <div id="checklist-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="location-sections" class="space-y-8"></div>
     </main>
 
     <div id="qr-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
-                    <i class="fa-solid fa-qrcode"></i> QR Code ประจำอุปกรณ์
+                    <i class="fa-solid fa-qrcode"></i> QR Code สแกนเข้าตรวจพื้นที่
                 </h3>
                 <button onclick="closeQrModal()" class="text-slate-500 hover:text-white">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             
-            <h4 id="qr-item-title" class="text-xs font-semibold text-white"></h4>
-            <p id="qr-item-code" class="text-[11px] font-mono text-slate-400 bg-slate-950 p-1 rounded-lg border border-slate-800"></p>
-            
+            <h4 id="qr-title" class="text-xs font-semibold text-white"></h4>
             <div class="bg-white p-4 rounded-2xl inline-block shadow-inner" id="qrcode-container"></div>
-            
-            <p class="text-[11px] text-slate-400">สแกน QR Code นี้บนมือถือเพื่อเปิดหน้าตรวจสอบอุปกรณ์ชิ้นนี้โดยตรง</p>
-            
+            <p class="text-[11px] text-slate-400">สแกน QR Code นี้เพื่อเปิดรายการตรวจเฉพาะห้องนี้โดยตรง</p>
             <button onclick="closeQrModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs rounded-xl font-semibold">ปิดหน้าต่าง</button>
         </div>
     </div>
@@ -117,8 +113,13 @@
             <input type="hidden" id="issue-item-id">
 
             <div>
-                <label class="block text-xs font-semibold text-rose-300 mb-1">เหตุผลที่ไม่พร้อมใช้งาน / อาการเสีย *</label>
-                <textarea id="issue-reason" rows="3" placeholder="ระบุอาการชำรุด สายหลุด มุมกล้องเพี้ยน ภาพดับ ฯลฯ..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-rose-500"></textarea>
+                <label class="block text-xs font-semibold text-rose-300 mb-1">อาการเสีย / เหตุผลที่ไม่พร้อมใช้งาน *</label>
+                <textarea id="issue-reason" rows="3" placeholder="ระบุอาการชำรุด เช่น ภาพดับ, สายหลุด, ปุ่มกดไม่ติด ฯลฯ..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-rose-500"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">ตำแหน่งปัจจุบัน (กรณีถูกย้ายห้อง)</label>
+                <input type="text" id="issue-current-loc" placeholder="ระบุห้องปัจจุบัน (ถ้ายกไปห้องอื่น)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500">
             </div>
 
             <div class="space-y-2">
@@ -145,8 +146,9 @@
 
     <script>
         let currentIssueBase64 = "";
-        let checklistData = JSON.parse(localStorage.getItem('kllc_checklist_full_v3')) || [{"id": 1, "sheet": "ห้อง100ที่นั่ง", "code": "57สห990000451116000-05(2)", "name": "เครื่องมิกเซอร์ YAMAHA", "qty": "1", "storage": "ห้อง100ที่นั่ง", "status": "พร้อมใช้งาน", "image": "", "remark": "-", "defect_reason": ""}];
-        let qrcodeObj = null;
+        let checklistData = JSON.parse(localStorage.getItem('kllc_checklist_full_v3')) || [
+            {"id": 1, "sheet": "ห้อง100ที่นั่ง", "code": "57สห990000451116000-05(2)", "name": "เครื่องมิกเซอร์ YAMAHA", "qty": "1", "storage": "ห้อง100ที่นั่ง", "status": "พร้อมใช้งาน", "image": "", "remark": "-", "defect_reason": "", "current_location": "ห้อง100ที่นั่ง"}
+        ];
 
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
@@ -160,110 +162,150 @@
             });
 
             const urlParams = new URLSearchParams(window.location.search);
-            const targetCode = urlParams.get('code');
-            if (targetCode) {
-                document.getElementById('search-input').value = targetCode;
+            const targetLoc = urlParams.get('loc');
+            
+            initLocationFilter();
+            if (targetLoc) {
+                document.getElementById('filter-location').value = targetLoc;
             }
 
-            initFilters();
-            filterChecklist();
+            filterAndRender();
             updateStats();
 
-            document.getElementById('search-input').addEventListener('input', filterChecklist);
-            document.getElementById('filter-sheet').addEventListener('change', filterChecklist);
-            document.getElementById('filter-status').addEventListener('change', filterChecklist);
+            document.getElementById('search-input').addEventListener('input', filterAndRender);
+            document.getElementById('filter-location').addEventListener('change', filterAndRender);
+            document.getElementById('filter-status').addEventListener('change', filterAndRender);
         });
 
-        function saveChecklistStorage() {
+        function saveStorage() {
             localStorage.setItem('kllc_checklist_full_v3', JSON.stringify(checklistData));
         }
 
-        function initFilters() {
-            const sheets = [...new Set(checklistData.map(i => i.sheet))];
-            const select = document.getElementById('filter-sheet');
-            select.innerHTML = '<option value="all">ทุกโซน/รวม CCTV (405 รายการ)</option>';
-            sheets.forEach(s => {
+        function initLocationFilter() {
+            const locations = [...new Set(checklistData.map(i => i.storage || i.sheet))];
+            const select = document.getElementById('filter-location');
+            select.innerHTML = '<option value="all">ทุกพื้นที่จัดเก็บ</option>';
+            locations.forEach(loc => {
                 const opt = document.createElement('option');
-                opt.value = s;
-                opt.textContent = s;
+                opt.value = loc;
+                opt.textContent = loc;
                 select.appendChild(opt);
             });
         }
 
-        function renderChecklist(data) {
-            const grid = document.getElementById('checklist-grid');
-            grid.innerHTML = '';
+        function filterAndRender() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const selectedLoc = document.getElementById('filter-location').value;
+            const selectedStatus = document.getElementById('filter-status').value;
 
-            data.forEach(item => {
-                const isUsable = item.status === 'พร้อมใช้งาน';
-                const card = document.createElement('div');
-                card.className = `rounded-3xl p-5 border transition flex flex-col justify-between shadow-xl ${
-                    isUsable 
-                    ? 'bg-slate-900/90 border-emerald-900/40 hover:border-emerald-600/60' 
-                    : 'bg-rose-950/20 border-rose-800/80 hover:border-rose-500'
-                }`;
+            const filtered = checklistData.filter(item => {
+                const matchQ = item.name.toLowerCase().includes(query) || item.code.toLowerCase().includes(query) || (item.storage && item.storage.toLowerCase().includes(query));
+                const matchL = selectedLoc === 'all' || item.storage === selectedLoc || item.sheet === selectedLoc;
+                const matchS = selectedStatus === 'all' || item.status === selectedStatus;
+                return matchQ && matchL && matchS;
+            });
 
-                const photoBadge = item.image 
-                    ? `<div class="mt-3 relative rounded-xl overflow-hidden h-36 bg-slate-950 border border-rose-900/50">
-                        <img src="${item.image}" class="w-full h-full object-cover">
-                        <span class="absolute bottom-2 left-2 bg-black/80 text-rose-300 text-[10px] px-2 py-0.5 rounded-lg border border-rose-800"><i class="fa-solid fa-camera mr-1"></i> ภาพปัญหา/อาการเสีย</span>
-                       </div>`
-                    : '';
+            renderGroupedByLocation(filtered);
+            updateStats();
+        }
 
-                const defectBlock = item.defect_reason 
-                    ? `<div class="mt-3 p-3 bg-rose-950/60 border border-rose-800/80 rounded-xl text-xs text-rose-200">
-                        <strong class="text-rose-400 block mb-0.5"><i class="fa-solid fa-circle-exclamation mr-1"></i> สาเหตุปัญหา:</strong> ${item.defect_reason}
-                       </div>`
-                    : '';
+        function renderGroupedByLocation(items) {
+            const container = document.getElementById('location-sections');
+            container.innerHTML = '';
 
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start gap-2">
-                            <span class="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">${item.code}</span>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="showQrModal('${item.code}', '${item.name}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-400 p-1 px-2 rounded-lg border border-slate-700" title="สร้าง QR Code">
-                                    <i class="fa-solid fa-qrcode"></i>
-                                </button>
-                                <span class="text-[11px] font-medium px-2.5 py-1 rounded-lg ${
-                                    isUsable 
-                                    ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/80' 
-                                    : 'bg-rose-950/80 text-rose-400 border border-rose-800/80 font-bold'
-                                }">
-                                    ${item.sheet}
-                                </span>
+            const grouped = {};
+            items.forEach(item => {
+                const locKey = item.storage || item.sheet || 'พื้นที่ทั่วไป';
+                if (!grouped[locKey]) grouped[locKey] = [];
+                grouped[locKey].push(item);
+            });
+
+            if (Object.keys(grouped).length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-slate-500 text-sm">ไม่พบข้อมูลอุปกรณ์ตามเงื่อนไขที่ค้นหาค่ะ</div>';
+                return;
+            }
+
+            for (const [locName, locItems] of Object.entries(grouped)) {
+                const usableCount = locItems.filter(i => i.status === 'พร้อมใช้งาน').length;
+                const totalLoc = locItems.length;
+
+                const section = document.createElement('div');
+                section.className = 'bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl';
+
+                section.innerHTML = `
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-slate-800 p-2.5 rounded-xl text-emerald-400 border border-slate-700">
+                                <i class="fa-solid fa-door-open text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">${locName}</h3>
+                                <p class="text-xs text-slate-400">อุปกรณ์ในพื้นที่: <strong class="text-slate-200">${totalLoc}</strong> รายการ | พร้อมใช้งาน: <span class="text-emerald-400 font-semibold">${usableCount}</span></p>
                             </div>
                         </div>
+                        <button onclick="showLocQr('${locName}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-400 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-qrcode"></i> QR Code ประจำห้องนี้
+                        </button>
+                    </div>
 
-                        <h4 class="text-sm font-bold text-white mt-3 leading-snug">${item.name}</h4>
-                        <div class="text-xs text-slate-400 mt-1 flex gap-3">
-                            <span>จำนวน: <strong class="text-slate-200">${item.qty}</strong></span>
-                            <span>สถานที่: <strong class="text-slate-200">${item.storage}</strong></span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                        ${locItems.map(item => renderItemCard(item)).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            }
+        }
+
+        function renderItemCard(item) {
+            const isUsable = item.status === 'พร้อมใช้งาน';
+            const defectBlock = item.defect_reason 
+                ? `<div class="mt-2 p-2.5 bg-rose-950/60 border border-rose-800/80 rounded-xl text-xs text-rose-200">
+                    <strong class="text-rose-400 block mb-0.5"><i class="fa-solid fa-circle-exclamation mr-1"></i> อาการเสีย:</strong> ${item.defect_reason}
+                   </div>`
+                : '';
+
+            const photoBadge = item.image 
+                ? `<div class="mt-2 relative rounded-xl overflow-hidden h-28 bg-slate-950 border border-rose-900/50">
+                    <img src="${item.image}" class="w-full h-full object-cover">
+                   </div>`
+                : '';
+
+            const locShiftBadge = (item.current_location && item.current_location !== item.storage)
+                ? `<span class="block mt-1 text-[11px] text-amber-400 font-medium"><i class="fa-solid fa-arrow-right-arrow-left mr-1"></i> ย้ายไปที่: ${item.current_location}</span>`
+                : '';
+
+            return `
+                <div class="rounded-2xl p-4 border transition flex flex-col justify-between ${
+                    isUsable ? 'bg-slate-950/60 border-slate-800 hover:border-slate-700' : 'bg-rose-950/20 border-rose-800/80'
+                }">
+                    <div>
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">${item.code}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
+                                isUsable ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'
+                            }">${item.status}</span>
                         </div>
-
+                        <h4 class="text-xs font-bold text-white mt-2">${item.name}</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">จำนวน: ${item.qty} ชิ้น</p>
+                        ${locShiftBadge}
                         ${defectBlock}
                         ${photoBadge}
                     </div>
 
-                    <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center gap-2">
-                        <button onclick="setUsable(${item.id})" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                            isUsable 
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30' 
-                            : 'bg-slate-800 text-slate-400 hover:bg-emerald-950 hover:text-emerald-400 border border-slate-700'
+                    <div class="pt-3 mt-3 border-t border-slate-800/80 flex items-center gap-2">
+                        <button onclick="setUsable(${item.id})" class="flex-1 py-1.5 rounded-lg text-xs font-semibold ${
+                            isUsable ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-emerald-950 hover:text-emerald-400'
                         }">
-                            <i class="fa-solid fa-circle-check"></i> พร้อมใช้งาน (เขียว)
+                            <i class="fa-solid fa-check mr-1"></i> ปกติ
                         </button>
-
-                        <button onclick="openIssueModal(${item.id})" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                            !isUsable 
-                            ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30' 
-                            : 'bg-slate-800 text-slate-400 hover:bg-rose-950 hover:text-rose-400 border border-slate-700'
+                        <button onclick="openIssueModal(${item.id})" class="flex-1 py-1.5 rounded-lg text-xs font-semibold ${
+                            !isUsable ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-rose-950 hover:text-rose-400'
                         }">
-                            <i class="fa-solid fa-circle-xmark"></i> ใช้งานไม่ได้ (แดง)
+                            <i class="fa-solid fa-xmark mr-1"></i> แจ้งปัญหา
                         </button>
                     </div>
-                `;
-                grid.appendChild(card);
-            });
+                </div>
+            `;
         }
 
         function setUsable(id) {
@@ -272,35 +314,10 @@
                 item.status = 'พร้อมใช้งาน';
                 item.defect_reason = '';
                 item.image = '';
-                saveChecklistStorage();
-                filterChecklist();
-                updateStats();
+                item.current_location = item.storage;
+                saveStorage();
+                filterAndRender();
             }
-        }
-
-        function showQrModal(code, name) {
-            document.getElementById('qr-item-title').textContent = name;
-            document.getElementById('qr-item-code').textContent = code;
-            
-            const qrContainer = document.getElementById('qrcode-container');
-            qrContainer.innerHTML = '';
-
-            const qrUrl = `${window.location.origin}${window.location.pathname}?code=${encodeURIComponent(code)}`;
-
-            qrcodeObj = new QRCode(qrContainer, {
-                text: qrUrl,
-                width: 180,
-                height: 180,
-                colorDark : "#0f172a",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-
-            document.getElementById('qr-modal').classList.remove('hidden');
-        }
-
-        function closeQrModal() {
-            document.getElementById('qr-modal').classList.add('hidden');
         }
 
         function openIssueModal(id) {
@@ -309,6 +326,7 @@
 
             document.getElementById('issue-item-id').value = item.id;
             document.getElementById('issue-reason').value = item.defect_reason || '';
+            document.getElementById('issue-current-loc').value = item.current_location || item.storage || '';
             currentIssueBase64 = item.image || '';
 
             const preview = document.getElementById('issue-image-preview');
@@ -369,9 +387,10 @@
         function saveIssueReport() {
             const id = parseInt(document.getElementById('issue-item-id').value);
             const reason = document.getElementById('issue-reason').value.trim();
+            const currentLoc = document.getElementById('issue-current-loc').value.trim();
 
             if (!reason) {
-                alert('โปรดระบุสาเหตุหรืออาการชำรุดที่ใช้งานไม่ได้ค่ะ');
+                alert('โปรดระบุสาเหตุหรืออาการชำรุดด้วยค่ะ');
                 return;
             }
 
@@ -379,28 +398,36 @@
             if (item) {
                 item.status = 'ใช้งานไม่ได้';
                 item.defect_reason = reason;
+                item.current_location = currentLoc || item.storage;
                 item.image = currentIssueBase64;
 
-                saveChecklistStorage();
-                filterChecklist();
-                updateStats();
+                saveStorage();
+                filterAndRender();
                 closeIssueModal();
             }
         }
 
-        function filterChecklist() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const sheet = document.getElementById('filter-sheet').value;
-            const status = document.getElementById('filter-status').value;
+        function showLocQr(locName) {
+            document.getElementById('qr-title').textContent = locName;
+            const qrContainer = document.getElementById('qrcode-container');
+            qrContainer.innerHTML = '';
 
-            const filtered = checklistData.filter(item => {
-                const matchQ = item.name.toLowerCase().includes(query) || item.code.toLowerCase().includes(query) || item.sheet.toLowerCase().includes(query) || item.storage.toLowerCase().includes(query);
-                const matchS = sheet === 'all' || item.sheet === sheet;
-                const matchSt = status === 'all' || item.status === status;
-                return matchQ && matchS && matchSt;
+            const qrUrl = `${window.location.origin}${window.location.pathname}?loc=${encodeURIComponent(locName)}`;
+
+            new QRCode(qrContainer, {
+                text: qrUrl,
+                width: 180,
+                height: 180,
+                colorDark : "#0f172a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
             });
 
-            renderChecklist(filtered);
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+
+        function closeQrModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
         }
 
         function updateStats() {
