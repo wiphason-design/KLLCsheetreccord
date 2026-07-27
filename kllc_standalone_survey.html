@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📋 ระบบบัญชีและประเมินอายุครุภัณฑ์โสตทัศนูปกรณ์ KLLC Master Hub</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --font-title: 'Outfit', 'Prompt', sans-serif;
+      --font-body: 'Prompt', sans-serif;
+      
+      --bg-app: hsl(222, 25%, 8%);
+      --bg-card: rgba(15, 23, 42, 0.55);
+      --bg-card-hover: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(14, 165, 233, 0.4);
+      
+      --color-primary: hsl(199, 89%, 48%);
+      --color-primary-glow: hsla(199, 89%, 48%, 0.2);
+      --color-secondary: hsl(150, 84%, 37%);
+      --color-secondary-glow: hsla(150, 84%, 37%, 0.15);
+      --color-danger: hsl(355, 90%, 62%);
+      --color-warning: hsl(38, 92%, 50%);
+      
+      --text-main: hsl(210, 20%, 92%);
+      --text-muted: hsl(215, 15%, 65%);
+      --text-active: hsl(0, 0%, 100%);
+      
+      --radius-m: 16px;
+      --radius-s: 10px;
+      --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 5% 10%, hsla(199, 89%, 48%, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 95% 90%, hsla(150, 84%, 37%, 0.06) 0%, transparent 35%);
+      background-attachment: fixed;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1450px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* --- HEADER --- */
+    header.app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-m);
+      box-shadow: var(--shadow-premium);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.app-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    }
+
+    .header-title h1 {
+      font-family: var(--font-title);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-active);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-title p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* --- TABS --- */
+    .tabs-wrapper {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      border-radius: var(--radius-m);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      overflow-x: auto;
+      display: flex;
+      gap: 6px;
+      scrollbar-width: none;
+    }
+    .tabs-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text-active);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--color-primary) 0%, hsl(199, 95%, 40%) 100%);
+      color: var(--text-active);
+      box-shadow: 0 4px 15px var(--color-primary-glow);
+    }
+
+    /* --- AGE ANALYSIS PANEL (OVER 10 YEARS BOXES) --- */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-m);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-premium);
+      transition: var(--transition-smooth);
+    }
+
+    .summary-box:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-glow);
+    }
+
+    .summary-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .summary-info h3 {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-info .val {
+      font-family: var(--font-title);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-active);
+      margin-top: 4px;
+    }
+
+    /* --- CARDS & PANELS --- */
+    .panel {
+      display: none;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-m);
+      padding: 24px;
+      box-shadow: var(--shadow-premium);
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: var(--border-glow);
+      box-shadow: 0 12px 36px rgba(14, 165, 233, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-active);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* --- SEARCH & CONTROL BAR --- */
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex-grow: 1;
+      min-width: 250px;
+    }
+
+    .search-wrapper i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-s);
+      background: rgba(10, 15, 30, 0.6);
+      font-family: var(--font-body);
+      color: var(--text-main);
+      font-size: 0.92rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+
+    .quick-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* --- BUTTONS --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: var(--radius-s);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      outline: none;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary) 0%, hsl(199, 95%, 40%) 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px var(--color-primary-glow);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-active);
+    }
+
+    .btn-danger {
+      background: var(--color-danger);
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: hsl(355, 90% , 52%);
+    }
+
+    /* --- CHIPS & COUNTERS --- */
+    .counter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* --- PREMIUM TABLE SYSTEM --- */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-s);
+      border: 1px solid var(--border-color);
+      background: rgba(10, 15, 30, 0.4);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--text-active);
+      font-weight: 600;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* --- STATUS BADGES --- */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition-smooth);
+    }
+    .status-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .status-working {
+      background: rgba(63, 185, 80, 0.12);
+      color: #3fb950;
+      border-color: rgba(63, 185, 80, 0.25);
+    }
+    .status-broken {
+      background: rgba(248, 81, 73, 0.12);
+      color: #f85149;
+      border-color: rgba(248, 81, 73, 0.25);
+    }
+    .status-maintenance {
+      background: rgba(210, 153, 34, 0.12);
+      color: #d29922;
+      border-color: rgba(210, 153, 34, 0.25);
+    }
+
+    /* --- AGE BADGES --- */
+    .age-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      border: 1px solid transparent;
+    }
+    .age-over10 {
+      background: rgba(248, 81, 73, 0.15);
+      color: #ff6b6b;
+      border-color: rgba(248, 81, 73, 0.3);
+    }
+    .age-mid {
+      background: rgba(217, 119, 6, 0.15);
+      color: #f59e0b;
+      border-color: rgba(217, 119, 6, 0.3);
+    }
+    .age-new {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+
+    /* --- ROW TYPE STYLING --- */
+    .row-category {
+      background: rgba(14, 165, 233, 0.06);
+      font-weight: bold;
+    }
+    .row-category td {
+      color: var(--color-primary);
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(14, 165, 233, 0.2);
+    }
+
+    /* --- IMAGE CELLS --- */
+    .image-cell-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .thumbnail-preview {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: var(--transition-smooth);
+    }
+    .thumbnail-preview:hover {
+      transform: scale(1.15);
+      border-color: var(--color-primary);
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.04);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .btn-icon:hover {
+      color: var(--text-active);
+      border-color: var(--color-primary);
+      background: var(--color-primary-glow);
+    }
+
+    /* --- MODAL DIALOGS --- */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: hsl(222, 25%, 12%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-m);
+      width: 100%;
+      max-width: 600px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .modal-close:hover {
+      color: var(--text-active);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-s);
+      background: rgba(0,0,0,0.25);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+    .form-control:focus {
+      border-color: var(--color-primary);
+    }
+
+    /* --- LIGHTBOX OVERLAY --- */
+    .lightbox-backdrop {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1100;
+    }
+    .lightbox-backdrop.show {
+      display: flex;
+    }
+    .lightbox-img {
+      max-width: 90%;
+      max-height: 85vh;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+
+    /* --- ANIMATIONS --- */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+      header.app-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+      }
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .tabs-wrapper {
+        padding: 4px;
+      }
+      .tab-btn {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-title">
+        <h1>📋 ระบบบัญชีและประเมินอายุครุภัณฑ์โสตทัศนูปกรณ์ KLLC Master Hub</h1>
+        <p>ฝ่ายเทคโนโลยีและพื้นที่การเรียนรู้ • สำนักการเรียนรู้ตลอดชีวิต สจล.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="exportFullJSON()"><i class="fa-solid fa-download"></i> ส่งออกข้อมูล (JSON)</button>
+        <button class="btn btn-danger" onclick="resetToInitial()"><i class="fa-solid fa-rotate-left"></i> รีเซ็ตฐานข้อมูล</button>
+      </div>
+    </header>
+
+    <!-- Visual Dashboard Metrics -->
+    <section class="summary-grid" id="summaryGrid">
+      <!-- Will be updated dynamically -->
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-wrapper" id="tabsContainer"></div>
+
+    <!-- Active Panel Content -->
+    <main class="panel active" id="mainPanel">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" id="activeTitle"></div>
+          <div class="header-actions" id="actionHeader">
+            <button class="btn btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> เพิ่มครุภัณฑ์ใหม่</button>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" id="sheetSearch" class="search-input" placeholder="ค้นหาด้วย เลขครุภัณฑ์, ประเภท, หรือจัดเก็บ..." oninput="handleSearch()">
+          </div>
+          <div class="quick-filters">
+            <button class="btn btn-secondary active-filter" id="f-all" onclick="setQuickFilter('all')">ทั้งหมด</button>
+            <button class="btn btn-secondary" id="f-over10" onclick="setQuickFilter('over10')" style="color:#ff6b6b;"><i class="fa-solid fa-triangle-exclamation"></i> อายุเกิน 10 ปี</button>
+            <button class="btn btn-secondary" id="f-broken" onclick="setQuickFilter('broken')" style="color:#f85149;"><i class="fa-solid fa-circle-xmark"></i> ชำรุด/เสีย</button>
+            <button class="btn btn-secondary" id="f-working" onclick="setQuickFilter('working')" style="color:#3fb950;"><i class="fa-solid fa-circle-check"></i> ใช้ได้ปกติ</button>
+          </div>
+        </div>
+
+        <div class="counter-bar" id="activeCounters"></div>
+
+        <div class="table-container" id="activeTableContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- EDIT / ADD MODAL -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="card-title" id="modalTitle"><i class="fa-solid fa-edit"></i> แก้ไขข้อมูลครุภัณฑ์</h2>
+        <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="modalFormContent"></div>
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+        <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="saveRecord()">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX OVERLAY -->
+  <div class="lightbox-backdrop" id="lightbox" onclick="this.classList.remove('show')">
+    <img id="lightboxImg" class="lightbox-img" src="" alt="ขยายใหญ่">
+  </div>
+
+  <script>
+    // Initial Database from Python Parse
+    const INITIAL_DB = {"สรุป": {"headers": ["ลำดับ", "รายการ", "จำนวน (รายการ)", "หมายเหตุ"], "data": [{"ลำดับ": "1", "รายการ": "ห้องประชุม 100 ที่นั่ง", "จำนวน (รายการ)": "54.0", "หมายเหตุ": ""}, {"ลำดับ": "2", "รายการ": "ห้องฉายภาพยนตร์ 30 ที่นั่ง", "จำนวน (รายการ)": "25.0", "หมายเหตุ": ""}, {"ลำดับ": "3", "รายการ": "ห้องคอมพิวเตอร์ 1 ชั้น 2", "จำนวน (รายการ)": "7.0", "หมายเหตุ": ""}, {"ลำดับ": "4", "รายการ": "ห้องคอมพิวเตอร์ 2 ชั้น 2", "จำนวน (รายการ)": "7.0", "หมายเหตุ": ""}, {"ลำดับ": "5", "รายการ": "ห้องคอมพิวเตอร์ 3 ชั้น 2", "จำนวน (รายการ)": "7.0", "หมายเหตุ": ""}, {"ลำดับ": "6", "รายการ": "ห้องคอมพิวเตอร์ 4 iMAC ชั้น 3", "จำนวน (รายการ)": "10.0", "หมายเหตุ": ""}, {"ลำดับ": "7", "รายการ": "ห้องสัมมนา 1 ชั้น 2 100 ที่นั่ง", "จำนวน (รายการ)": "7.0", "หมายเหตุ": ""}, {"ลำดับ": "8", "รายการ": "ห้องสัมมนา 2 ชั้น 2", "จำนวน (รายการ)": "2.0", "หมายเหตุ": ""}, {"ลำดับ": "9", "รายการ": "ห้องสัมมนา 3 ชั้น 2", "จำนวน (รายการ)": "2.0", "หมายเหตุ": ""}, {"ลำดับ": "10", "รายการ": "ห้องสัมมนา 4 ชั้น 2", "จำนวน (รายการ)": "2.0", "หมายเหตุ": ""}, {"ลำดับ": "11", "รายการ": "ห้องสัมมนา 5 ชั้น 2", "จำนวน (รายการ)": "2.0", "หมายเหตุ": ""}, {"ลำดับ": "12", "รายการ": "ชุดเครื่องเสียง 1", "จำนวน (รายการ)": "12.0", "หมายเหตุ": ""}, {"ลำดับ": "13", "รายการ": "ชุดเครื่องเสียง 2", "จำนวน (รายการ)": "20.0", "หมายเหตุ": ""}, {"ลำดับ": "14", "รายการ": "ห้องประชุม 1", "จำนวน (รายการ)": "14.0", "หมายเหตุ": ""}, {"ลำดับ": "15", "รายการ": "ห้องประชุม 2", "จำนวน (รายการ)": "2.0", "หมายเหตุ": ""}, {"ลำดับ": "16", "รายการ": "ห้องประชุม 3", "จำนวน (รายการ)": "3.0", "หมายเหตุ": ""}, {"ลำดับ": "17", "รายการ": "Video Wall สีส้ม", "จำนวน (รายการ)": "19.0", "หมายเหตุ": ""}, {"ลำดับ": "18", "รายการ": "Video Wall สีม่วง", "จำนวน (รายการ)": "21.0", "หมายเหตุ": ""}, {"ลำดับ": "19", "รายการ": "ห้องสัมมนา 1 ชั้น 1 (คาราโอเกะ)", "จำนวน (รายการ)": "10.0", "หมายเหตุ": ""}, {"ลำดับ": "20", "รายการ": "ห้องสัมมนา 2 ชั้น 1 (คาราโอเกะ)", "จำนวน (รายการ)": "9.0", "หมายเหตุ": ""}, {"ลำดับ": "21", "รายการ": "ห้องสัมมนา 3 ชั้น 1 (คาราโอเกะ)", "จำนวน (รายการ)": "8.0", "หมายเหตุ": ""}, {"ลำดับ": "22", "รายการ": "ห้องสัมมนา 4 ชั้น 1 (คาราโอเกะ)", "จำนวน (รายการ)": "9.0", "หมายเหตุ": ""}, {"ลำดับ": "23", "รายการ": "ห้องประชุม 1 ชั้น 4", "จำนวน (รายการ)": "14.0", "หมายเหตุ": ""}, {"ลำดับ": "24", "รายการ": "ห้องประชุม 2 ชั้น 4", "จำนวน (รายการ)": "2.0", "หมายเหตุ": ""}, {"ลำดับ": "25", "รายการ": "ห้องประชุม 3 ชั้น 4", "จำนวน (รายการ)": "3.0", "หมายเหตุ": ""}, {"ลำดับ": "", "รายการ": "", "จำนวน (รายการ)": "271.0", "หมายเหตุ": ""}, {"_type": "category", "title": "อุปกรณ์อื่นๆ"}, {"ลำดับ": "1", "รายการ": "เครื่องฉายโปรเจคเตอร์ SONY", "จำนวน (รายการ)": "2.0", "หมายเหตุ": ""}, {"ลำดับ": "2", "รายการ": "เครื่องฉายโปรเจคเตอร์ Panasonic", "จำนวน (รายการ)": "4.0", "หมายเหตุ": ""}, {"ลำดับ": "3", "รายการ": "ลำโพงเล็ก YAMAHA", "จำนวน (รายการ)": "3.0", "หมายเหตุ": ""}, {"ลำดับ": "4", "รายการ": "ขาไมค์สั้น", "จำนวน (รายการ)": "8.0", "หมายเหตุ": ""}, {"ลำดับ": "5", "รายการ": "ขาไมค์ยาว", "จำนวน (รายการ)": "9.0", "หมายเหตุ": ""}, {"ลำดับ": "6", "รายการ": "ไมค์ตั้งโต๊ะ", "จำนวน (รายการ)": "3.0", "หมายเหตุ": ""}, {"ลำดับ": "7", "รายการ": "เครื่องบลูเรย์ SONY", "จำนวน (รายการ)": "1.0", "หมายเหตุ": ""}, {"ลำดับ": "8", "รายการ": "ไซเน็ต LG", "จำนวน (รายการ)": "1.0", "หมายเหตุ": ""}, {"ลำดับ": "9", "รายการ": "เครื่องฉาย DIGITAL VISVALIZER", "จำนวน (รายการ)": "1.0", "หมายเหตุ": ""}, {"ลำดับ": "10", "รายการ": "ตัวรับสัญญาณไมค์ลอย SHURE", "จำนวน (รายการ)": "1.0", "หมายเหตุ": ""}, {"ลำดับ": "11", "รายการ": "", "จำนวน (รายการ)": "3.0", "หมายเหตุ": ""}, {"ลำดับ": "12", "รายการ": "จอ Smart TV (63)", "จำนวน (รายการ)": "4.0", "หมายเหตุ": ""}, {"ลำดับ": "", "รายการ": "", "จำนวน (รายการ)": "40", "หมายเหตุ": ""}]}, "ห้อง100ที่นั่ง": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้งานได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ", "คอลัมน์_9"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "57สห990000451116000-05(2)", "ประเภทครุภัณฑ์": "เครื่องมิกเซอร์ YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": "ใช้งานได้"}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห990000451116000-05(40)", "ประเภทครุภัณฑ์": "เครื่องช่องสัญญาณ KRAMER", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": "ใช้งานไม่ได้"}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห990000451116000-05(50)", "ประเภทครุภัณฑ์": "เครื่องบันทึกวงจรปิด Panasonic", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห990000451116000-05(49)", "ประเภทครุภัณฑ์": "เครื่องบลูเรย์ SONY", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "57สห990000451116000-05(61)", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณวงจรปิด", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "57สห990000451116000-05(1)", "ประเภทครุภัณฑ์": "เครื่องแอมป์เสียง VXP", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "57สห990000451116000-05(19)", "ประเภทครุภัณฑ์": "เครื่องพาวเวอร์แอมป์ Crown XLi800", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "57สห990000451116000-05(20)", "ประเภทครุภัณฑ์": "เครื่องพาวเวอร์แอมป์ Crown XLi800", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "57สห990000451116000-05(47)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "57สห990000451116000-05(43)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "57สห990000451116000-05(45)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "57สห990000451116000-05(48)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "57สห990000451116000-03(5)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "57สห990000451116000-04(12)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "57สห990000451116000-01(38)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "16", "เลขครุภัณฑ์": "57สห990000451116000-05(44)", "ประเภทครุภัณฑ์": "KRAMER รับสัญญาณ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "17", "เลขครุภัณฑ์": "57สห990000451116000-05(174)", "ประเภทครุภัณฑ์": "ตู้แร็ก", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "18", "เลขครุภัณฑ์": "57สห990000451116000-05(52)", "ประเภทครุภัณฑ์": "ทีวี SONY", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "19", "เลขครุภัณฑ์": "57สห990000451116000-05(53", "ประเภทครุภัณฑ์": "ทีวี SONY", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "20", "เลขครุภัณฑ์": "57สห990000451116000-05(51)", "ประเภทครุภัณฑ์": "ตู้ control กล้องวงจรปิด", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "21", "เลขครุภัณฑ์": "57สห990000451116000-05(42)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "รอจำหน่าย", "คอลัมน์_9": ""}, {"ลำดับ": "22", "เลขครุภัณฑ์": "57สห990000451116000-05(41)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "23", "เลขครุภัณฑ์": "57สห990000451116000-05(17)", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA DSX15", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "24", "เลขครุภัณฑ์": "57สห990000451116000-05(18)", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA DSX15", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "25", "เลขครุภัณฑ์": "57สห990000451116000-05(16)", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA DSX15", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "26", "เลขครุภัณฑ์": "57สห990000451116000-05(5)", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "27", "เลขครุภัณฑ์": "57สห990000451116000-05(3)", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "28", "เลขครุภัณฑ์": "57สห990000451116000-05(21)", "ประเภทครุภัณฑ์": "ลำโพง MONITOR YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "29", "เลขครุภัณฑ์": "57สห990000451116000-05(22)", "ประเภทครุภัณฑ์": "ลำโพง MONITOR YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "30", "เลขครุภัณฑ์": "57สห990000451116000-05(23", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "31", "เลขครุภัณฑ์": "57สห990000451116000-05(24)", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "32", "เลขครุภัณฑ์": "57สห990000451116000-05(25)", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "33", "เลขครุภัณฑ์": "57สห990000451116000-05(6)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "34", "เลขครุภัณฑ์": "57สห990000451116000-05(7)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "35", "เลขครุภัณฑ์": "57สห990000451116000-05(8)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "36", "เลขครุภัณฑ์": "57สห990000451116000-05(9)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "37", "เลขครุภัณฑ์": "57สห990000451116000-05(10)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "38", "เลขครุภัณฑ์": "57สห990000451116000-05(11)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "39", "เลขครุภัณฑ์": "57สห990000451116000-05(12", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "40", "เลขครุภัณฑ์": "57สห990000451116000-05(13", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "41", "เลขครุภัณฑ์": "57สห990000451116000-05(14", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "42", "เลขครุภัณฑ์": "57สห990000451116000-05(15)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียง YAMAHA", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "43", "เลขครุภัณฑ์": "57สห990000451116000-05(179)", "ประเภทครุภัณฑ์": "ทีวี SAMSUNG", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "44", "เลขครุภัณฑ์": "59สห01016496000000-001", "ประเภทครุภัณฑ์": "ทีวี SAMSUNG", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "45", "เลขครุภัณฑ์": "57สห990000451116000-05(172)", "ประเภทครุภัณฑ์": "โพเดี่ยม", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "46", "เลขครุภัณฑ์": "57สห990000451116000-05(173)", "ประเภทครุภัณฑ์": "ไมค์โพเดี่ยม", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "47", "เลขครุภัณฑ์": "67สรช01017181000000-01(1/6)", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "48", "เลขครุภัณฑ์": "67สรช01017181000000-01(2/6)", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "49", "เลขครุภัณฑ์": "67สรช01017181000000-04(1/6)", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "50", "เลขครุภัณฑ์": "67สรช01017181000000-04(2/6)", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "51", "เลขครุภัณฑ์": "67สรช01017181000000-01(5/6)", "ประเภทครุภัณฑ์": "ตัวรัับสัญญาณไมค์ลอย", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "52", "เลขครุภัณฑ์": "67สรช01017181000000-04(5/6)", "ประเภทครุภัณฑ์": "ตัวรัับสัญญาณไมค์ลอย", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "53", "เลขครุภัณฑ์": "57สห990000451116000-05(26)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "54", "เลขครุภัณฑ์": "57สห990000451116000-05(28)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้งานได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "คอลัมน์_9": ""}]}, "ห้อง30ที่นั่ง": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "57สห990004511160000-1(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห990004511160000-1(4)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "39สห7730-3-2-27", "ประเภทครุภัณฑ์": "ทีวีPanasonic", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห9900045111600001-02(46)", "ประเภทครุภัณฑ์": "เครื่องบลูเรย์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "57สห99000451116000-01(3)", "ประเภทครุภัณฑ์": "เครื่องพาวเวอร์แอมป์ YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "57สห99000451116000-01(37)", "ประเภทครุภัณฑ์": "ทีวี SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "39สห5965-2-2-17", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "39สห5965-2-2-18", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "39สห5965-2-2-29", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "39สห5965-2-2-20", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "39สห5965-2-2-21", "ประเภทครุภัณฑ์": "ลำโพง YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "57สห990004511160000-1(15)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียงทวิตเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "57สห990004511160000-1(16)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียงทวิตเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "57สห990004511160000-1(35)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียงทวิตเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "57สห990004511160000-1(35)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียงทวิตเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "16", "เลขครุภัณฑ์": "57สห990004511160000-1(36", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียงทวิตเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "17", "เลขครุภัณฑ์": "57สห990004511160000-1(36)", "ประเภทครุภัณฑ์": "ลำโพงแยกเสียงทวิตเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "18", "เลขครุภัณฑ์": "57สห99000451116000-01(38)", "ประเภทครุภัณฑ์": "KRAMERรับสัญญาณ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "19", "เลขครุภัณฑ์": "57สห99000451116000-03(8)", "ประเภทครุภัณฑ์": "KRAMERรับสัญญาณ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "20", "เลขครุภัณฑ์": "57สห99000451116000-01(15)", "ประเภทครุภัณฑ์": "KRAMERรับสัญญาณ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "21", "เลขครุภัณฑ์": "57สห990004511160001-02(23)", "ประเภทครุภัณฑ์": "เครื่องมิกเซอร์YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "22", "เลขครุภัณฑ์": "57สห990004511160001-02(50)", "ประเภทครุภัณฑ์": "ตู้แร็ก", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "23", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "24", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "25", "เลขครุภัณฑ์": "38สห5965-10-1-1(2)", "ประเภทครุภัณฑ์": "ขาไมค์ตั้งโต๊ะ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "ห้อง 20 ที่นั่ง": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "57สห990004511160000-1(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ทีวี Samsung 75", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "เครื่องขยายเสียง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ Shure", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "16", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "17", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "18", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "19", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "20", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "21", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "22", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "23", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "24", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "25", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "ห้องคอมฯ3": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045111000-05-5", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "63สห99000045111000-05-5", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "63สห99000045111000-05-5", "ประเภทครุภัณฑ์": "แอมป์เสียง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "63สห99000045111000-05-5", "ประเภทครุภัณฑ์": "ไมค์ลอยRODE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "63สห99000045111000-05-5", "ประเภทครุภัณฑ์": "ไมค์สายSHURE", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "63สห99000045111000-05-5", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ลอยRODE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "ชุดเครื่องเสียง1-2": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "57สห01015681000000-01(20)", "ประเภทครุภัณฑ์": "ตู้แร็ก", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "VDO WALL A", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห01015681000000-01(1)", "ประเภทครุภัณฑ์": "เครื่องมิกเซอร์ YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห01015681000000-01(17)", "ประเภทครุภัณฑ์": "จอมอนิเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห01015681000000-01(11)", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "57สห01015681000000-01(12)", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "57สห01015681000000-01(15)", "ประเภทครุภัณฑ์": "เครื่องบลูเรย์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "57สห01015681000000-01(3)", "ประเภทครุภัณฑ์": "เครื่องแอมป์เสียง Crown XLi1500", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "57สห01015681000000-01(5)", "ประเภทครุภัณฑ์": "เครื่องแอมป์ไมค์ BOSE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "ชุด2"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "57สห01015681000000-01(19)", "ประเภทครุภัณฑ์": "ตู้แร็ก", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห01015681000000-01(2)", "ประเภทครุภัณฑ์": "เครื่องมิกเซอร์ YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห01015681000000-01(12)", "ประเภทครุภัณฑ์": "จอมอนิเตอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห01015681000000-01(13)", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "57สห01015681000000-01(14)", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "57สห01015681000000-01(16)", "ประเภทครุภัณฑ์": "เครื่องบลูเรย์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "57สห01015681000000-01(4)", "ประเภทครุภัณฑ์": "เครื่องแอมป์เสียง Crown XLi1500", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "57สห01015681000000-01(6)", "ประเภทครุภัณฑ์": "เครื่องแอมป์ไมค์ BOSE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "1", "เลขครุภัณฑ์": "57สห01015681000000-01(7)", "ประเภทครุภัณฑ์": "ลำโพง BOSE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห01015681000000-01(8)", "ประเภทครุภัณฑ์": "ลำโพง BOSE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห01015681000000-01(9)", "ประเภทครุภัณฑ์": "ลำโพง BOSE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห01015681000000-01(10)", "ประเภทครุภัณฑ์": "ลำโพง BOSE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "1", "เลขครุภัณฑ์": "57สห01015681000000-01(7.1)", "ประเภทครุภัณฑ์": "ขาตั้งลำโพง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห01015681000000-01(8.1)", "ประเภทครุภัณฑ์": "ขาตั้งลำโพง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห01015681000000-01(9.1)", "ประเภทครุภัณฑ์": "ขาตั้งลำโพง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห01015681000000-01(10.1)", "ประเภทครุภัณฑ์": "ขาตั้งลำโพง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "จอ VDW 1-2": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"_type": "category", "title": "walllส้ม"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "57สห99000045111600-04(19)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห99000045111600-04(20)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห99000045111600-04(21)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห99000045111600-04(22)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "57สห99000045111600-04(23)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "57สห99000045111600-04(24)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "57สห99000045111600-04(25)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "57สห99000045111600-04(26)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "57สห99000045111600-04(27)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "57สห99000045111600-04(34)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "57สห99000045111600-04(35)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "57สห99000045111600-04(36)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "57สห99000045111600-04(37)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "57สห99000045111600-04(38)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "57สห99000045111600-04(39)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "16", "เลขครุภัณฑ์": "57สห99000045111600-04(40)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "17", "เลขครุภัณฑ์": "57สห99000045111600-04(41)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "18", "เลขครุภัณฑ์": "57สห99000045111600-04(42)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "19", "เลขครุภัณฑ์": "57สห99000045111600-04(14)", "ประเภทครุภัณฑ์": "ตัวKRAMERรับสัญญาณ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "wallม่วง"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "57สห99000045111600-04(9)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห99000045111600-04(10)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห99000045111600-04(11)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห99000045111600-04(12)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "57สห99000045111600-04(13)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "57สห99000045111600-04(14)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "57สห99000045111600-04(16)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "57สห99000045111600-04(17)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "57สห99000045111600-04(18)", "ประเภทครุภัณฑ์": "จอLG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "57สห99000045111600-04(17)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "57สห99000045111600-04(18)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "57สห99000045111600-04(19)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "57สห99000045111600-04(20)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "57สห99000045111600-04(21)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "57สห99000045111600-04(22)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "16", "เลขครุภัณฑ์": "57สห99000045111600-04(31)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "17", "เลขครุภัณฑ์": "57สห99000045111600-04(32)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "18", "เลขครุภัณฑ์": "57สห99000045111600-04(33)", "ประเภทครุภัณฑ์": "ชุดติดตั้งจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "19", "เลขครุภัณฑ์": "57สห99000045111600-04(7)", "ประเภทครุภัณฑ์": "KRAMERรับสัญญาณ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "20", "เลขครุภัณฑ์": "57สห99000045111600-04(29)", "ประเภทครุภัณฑ์": "CPU LG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "21", "เลขครุภัณฑ์": "39สห5820-2-1-6", "ประเภทครุภัณฑ์": "เครื่องต่อแยกสัญญาณจอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "CCTV KLLC": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "68 สรช.01044620000000-01(1)", "ประเภทครุภัณฑ์": "CCTV Hikvision", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "อาคาร B", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "68 สรช.01044620000000-01(2)", "ประเภทครุภัณฑ์": "CCTV Hikvision", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "68 สรช.01044620000000-01(3)", "ประเภทครุภัณฑ์": "CCTV Hikvision", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "68 สรช.01044620000000-01(4)", "ประเภทครุภัณฑ์": "CCTV Hikvision", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "68 สรช.01044620000000-01(5)", "ประเภทครุภัณฑ์": "CCTV Hikvision", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "CCTV Hikvision", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "CCTV Hikvision", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "ครุภัณฑ์โสตฯอื่นๆ": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "57สห990004511160001-01(32)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "57สห990004511160001-01(33)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห990004511160001-01(36)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "57สห990004511160001-01(39)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "57สห990004511160001-01(40)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "57สห990004511160001-01(42)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "57สห990004511160001-01(43)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "57สห990004511160001-01(37)", "ประเภทครุภัณฑ์": "โน๊ตบุ๊ค lenovo", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "0", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "57สห99000045111600-04(9)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "57สห99000045111600-04(30)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "54สห99000045111600-01", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ Panasonic", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "54สห99000045111600-01(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ Panasonic", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "51สห99000045111600-1", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ Panasonic", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "16", "เลขครุภัณฑ์": "51สห99000045111600-2", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ Panasonic", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "17", "เลขครุภัณฑ์": "39สห5965-9-2-6", "ประเภทครุภัณฑ์": "ลำโพงเล็ก YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "18", "เลขครุภัณฑ์": "39สห5965-2-2-11", "ประเภทครุภัณฑ์": "ลำโพงเล็ก YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "19", "เลขครุภัณฑ์": "39สห5965-2-2-12", "ประเภทครุภัณฑ์": "ลำโพงเล็ก YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "20", "เลขครุภัณฑ์": "57สห01015681000000-01(11.2)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "21", "เลขครุภัณฑ์": "57สห01015681000000-01(12.2)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "22", "เลขครุภัณฑ์": "57สห01015681000000-01(13.2)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "23", "เลขครุภัณฑ์": "57สห01015681000000-01(14.1)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "24", "เลขครุภัณฑ์": "57สห9900045111600-05(36)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "25", "เลขครุภัณฑ์": "57สห9900045111600-05(37)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "26", "เลขครุภัณฑ์": "57สห9900045111600-05(38)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "27", "เลขครุภัณฑ์": "57สห9900045111600-05(39)", "ประเภทครุภัณฑ์": "ขาไมค์สั้น", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "28", "เลขครุภัณฑ์": "57สห01015681000000-01(11.1)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "29", "เลขครุภัณฑ์": "57สห01015681000000-01(12.1)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "30", "เลขครุภัณฑ์": "57สห01015681000000-01(13.1)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "31", "เลขครุภัณฑ์": "57สห01015681000000-01(14.1)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "32", "เลขครุภัณฑ์": "57สห99000045111600-05(30)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "33", "เลขครุภัณฑ์": "57สห99000045111600-05(31)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "34", "เลขครุภัณฑ์": "57สห99000045111600-05(32)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "35", "เลขครุภัณฑ์": "57สห99000045111600-05(33)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "36", "เลขครุภัณฑ์": "57สห99000045111600-05(34)", "ประเภทครุภัณฑ์": "ขาไมค์ยาว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "37", "เลขครุภัณฑ์": "57สห990004511160001-02(47)", "ประเภทครุภัณฑ์": "ไมค์ตั้งโต๊ะ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "38", "เลขครุภัณฑ์": "57สห990004511160001-02(48)", "ประเภทครุภัณฑ์": "ไมค์ตั้งโต๊ะ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "39", "เลขครุภัณฑ์": "38สห5965-10-1-2(2)", "ประเภทครุภัณฑ์": "ไมค์ตั้งโต๊ะ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "40", "เลขครุภัณฑ์": "57สห99000451116000-01(39)", "ประเภทครุภัณฑ์": "เครื่องบลูเรย์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "41", "เลขครุภัณฑ์": "57สห99000045111600-03(16)", "ประเภทครุภัณฑ์": "ไซเน็ต LG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "42", "เลขครุภัณฑ์": "57สห990004511160001-01(44)", "ประเภทครุภัณฑ์": "เครื่องฉายDIGITAL VISUALIZER", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "43", "เลขครุภัณฑ์": "57สห99000045111600-04(1)", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ลอยSHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "44", "เลขครุภัณฑ์": "ยังไม่มีหมายเลขครุภัณฑ์ (ออมสิน)", "ประเภทครุภัณฑ์": "TV ดิจิตอลเคลื่อนที่ LG 65นิ้ว", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "45", "เลขครุภัณฑ์": "ยังไม่มีหมายเลขครุภัณฑ์ (ออมสิน)", "ประเภทครุภัณฑ์": "โพเดี่ยม(ดำ)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "46", "เลขครุภัณฑ์": "จอ Smart TV (อ.อู๊ด และศูนย์ฉีดวัคซีน...62)", "ประเภทครุภัณฑ์": "", "จำนวน": "3", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "47", "เลขครุภัณฑ์": "จอ LG Smart  TV  4 เครื่อง", "ประเภทครุภัณฑ์": "จอ LG Smart TV 55 นิ้ว", "จำนวน": "3", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "48", "เลขครุภัณฑ์": "จอ LG Smart  TV  4 เครื่อง", "ประเภทครุภัณฑ์": "จอ LG Smart TV 55 นิ้ว   (03)", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "ด่านช้าง", "หมายเหตุ": "ผอ.ให้ด่านช้าง"}, {"ลำดับ": "49", "เลขครุภัณฑ์": "67 สรช.01042027000000-01(1/2)", "ประเภทครุภัณฑ์": "5-CH HDSWITCHER", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "ห้อง 30 นั่งชั่วคราว", "หมายเหตุ": ""}, {"ลำดับ": "50", "เลขครุภัณฑ์": "67 สรช.01017181000000-01", "ประเภทครุภัณฑ์": "Shure wireless", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "100 ที่นั่ง", "หมายเหตุ": ""}, {"ลำดับ": "51", "เลขครุภัณฑ์": "67 สรช.01017181000000-02", "ประเภทครุภัณฑ์": "Shure wireless", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "Studio", "หมายเหตุ": ""}, {"ลำดับ": "52", "เลขครุภัณฑ์": "67 สรช.01017181000000-03", "ประเภทครุภัณฑ์": "Shure wireless", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "โถงเอ", "หมายเหตุ": ""}, {"ลำดับ": "53", "เลขครุภัณฑ์": "67 สรช.01017181000000-04", "ประเภทครุภัณฑ์": "Shure wireless", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "100 ที่นั่ง", "หมายเหตุ": ""}, {"ลำดับ": "54", "เลขครุภัณฑ์": "67 สรช.01017181000000-05", "ประเภทครุภัณฑ์": "Shure wireless", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "Studio", "หมายเหตุ": ""}, {"ลำดับ": "55", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ชุดลำโพง แนวตั้ง  JBL PRX ONE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "โถงเอ", "หมายเหตุ": ""}, {"ลำดับ": "56", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ชุดลำโพง แนวตั้ง  JBL  PRX ONE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "โถงเอ", "หมายเหตุ": ""}, {"ลำดับ": "57", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ชุดไมโครโฟน ไวเลส Shure wireless 1 ชุด", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "โถงบี", "หมายเหตุ": "ไมค์ 2 ตัว"}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ชุดไมโครโฟน ไวเลส Shure wireless 1 ชุด", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "โถงบี", "หมายเหตุ": "ไมค์ 2 ตัว"}, {"ลำดับ": "58", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ชุด mixer ผสมสัญญาณเสียง sound craft nano", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "โถงเอ", "หมายเหตุ": ""}, {"ลำดับ": "59", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "วิทยุสื่อสาร สีแดง", "จำนวน": "6", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "60", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ชุดประชุมทางไกล  VDO Conferend", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "ห้อง ผอ.", "หมายเหตุ": ""}, {"ลำดับ": "61", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "สายสัญญาณ AV 5 เมตร", "จำนวน": "4", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "โถง B", "หมายเหตุ": "ไมค์ประชุม"}]}, "รับจาก B-Tech": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ", "รับมา", "คอลัมน์_10"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "นว6401017999000000-01", "ประเภทครุภัณฑ์": "ลำโพงเคลื่อนที่", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "งานพื้นที่", "หมายเหตุ": "BTECH", "รับมา": "รับมา310165", "คอลัมน์_10": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "MIC ไร้สาย", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "รีโมท", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "adaptor", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "นว6401017999000000-02", "ประเภทครุภัณฑ์": "ลำโพงเคลื่อนที่", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "งานพื้นที่", "หมายเหตุ": "BTECH", "รับมา": "รับมา310165", "คอลัมน์_10": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "MIC ไร้สาย", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "รีโมท", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "adaptor", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "64นว99000045111600-01", "ประเภทครุภัณฑ์": "Epson Projector", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "งานพื้นที่", "หมายเหตุ": "BTECH", "รับมา": "รับมา08092565", "คอลัมน์_10": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "64นว99000045111600-02", "ประเภทครุภัณฑ์": "Epson Projector", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "งานพื้นที่", "หมายเหตุ": "BTECH", "รับมา": "รับมา08092565", "คอลัมน์_10": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "64นว99000045111600-03", "ประเภทครุภัณฑ์": "Epson Projector", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "งานพื้นที่", "หมายเหตุ": "BTECH", "รับมา": "รับมา08092565", "คอลัมน์_10": "ติดตั้งอยู่ห้องคอม 3"}, {"ลำดับ": "12", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "สาย HDMI Ztech 10 m", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "งานพื้นที่", "หมายเหตุ": "BTECH", "รับมา": "รับมา08092565", "คอลัมน์_10": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": "", "รับมา": "", "คอลัมน์_10": ""}]}, " ห้องสตูดิโอ & Fablab": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ", "คอลัมน์_9"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045121500-0001(1)", "ประเภทครุภัณฑ์": "กล้องถ่ายทอดสด", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "63สห99000045121500-0001(2)", "ประเภทครุภัณฑ์": "กล้องถ่ายทอดสด(mevo)", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ของห้องสมุด", "คอลัมน์_9": "Studio"}, {"ลำดับ": "3", "เลขครุภัณฑ์": "63สห99000045121500-0001(3)", "ประเภทครุภัณฑ์": "ขาตั้งกล้อง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "2566-05-09 00:00:00", "คอลัมน์_9": "ok รับคืน"}, {"ลำดับ": "4", "เลขครุภัณฑ์": "63สห99000045121500-0001(4)", "ประเภทครุภัณฑ์": "ขาตั้งกล้อง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "63สห99000045121500-0001(5)", "ประเภทครุภัณฑ์": "แท็บเล็ต", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "พี่พัน", "คอลัมน์_9": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "63สห99000045121500-0001(6)", "ประเภทครุภัณฑ์": "แท็บเล็ต", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "พี่พัน", "คอลัมน์_9": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "63สห99000045121500-0001(7)", "ประเภทครุภัณฑ์": "ขาตั้งกล้องเคลื่อนที่", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "63สห99000045121500-0001(8)", "ประเภทครุภัณฑ์": "ขาตั้งกล้องเคลื่อนที่", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "63สห99000045121500-0001(9)", "ประเภทครุภัณฑ์": "ไมโครโฟนไร้สายแบบหนีบ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "63สห99000045121500-0001(10)", "ประเภทครุภัณฑ์": "ไมโครโฟนไร้สายแบบหนีบ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "63สห99000045121500-0001(11)", "ประเภทครุภัณฑ์": "ชุดสตูโอถ่ายภาพขนาดใหญ่", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "63สห01018111000000-0001", "ประเภทครุภัณฑ์": "ไมโครโฟนอัดเสียง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "62สว1054134000000-01 -02 -03", "ประเภทครุภัณฑ์": "Imac pro", "จำนวน": "3", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "PR", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "62สว1041861000000-07 -06 -05", "ประเภทครุภัณฑ์": "Imac", "จำนวน": "3", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "PR", "หมายเหตุ": "-05 IT ดูแล", "คอลัมน์_9": ""}, {"ลำดับ": "15", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "DSLR 5D Mark 4", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "2566-05-09 00:00:00", "คอลัมน์_9": "ok รับคืน"}, {"ลำดับ": "16", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "Crane Dslr", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "17", "เลขครุภัณฑ์": "62สว99000042293700-02", "ประเภทครุภัณฑ์": "CNC Laser Cut Set", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "18", "เลขครุภัณฑ์": "62สว99000042293700-05", "ประเภทครุภัณฑ์": "CNC Laser Cut Set", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "19", "เลขครุภัณฑ์": "62สว99000042293700-06", "ประเภทครุภัณฑ์": "CNC Laser Cut Set", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "20", "เลขครุภัณฑ์": "62สว01016547000000-06", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": "1966-03-08 00:00:00"}, {"ลำดับ": "21", "เลขครุภัณฑ์": "62สว01016547000000-07", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "22", "เลขครุภัณฑ์": "62สว01016547000000-08", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "23", "เลขครุภัณฑ์": "62สว01016547000000-09", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "24", "เลขครุภัณฑ์": "62สว01016547000000-10", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "25", "เลขครุภัณฑ์": "62สว01016547000000-11", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "26", "เลขครุภัณฑ์": "62สว01016547000000-12", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "27", "เลขครุภัณฑ์": "62สว01016547000000-13", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "28", "เลขครุภัณฑ์": "62สว01016547000000-14", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "29", "เลขครุภัณฑ์": "62สว01016547000000-15", "ประเภทครุภัณฑ์": "3D Printer (filament)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "ส่งซ่อม KRIS", "คอลัมน์_9": ""}, {"ลำดับ": "30", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "3D Resin", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "31", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "3D Resin", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "32", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "3D Scanner", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}, {"ลำดับ": "32", "เลขครุภัณฑ์": "67 สรช.01042027000000-01", "ประเภทครุภัณฑ์": "Switcher devicewell", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "IT & SP", "หมายเหตุ": "", "คอลัมน์_9": ""}]}, "ห้องคอมฯ1-2": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045111000-05-3", "ประเภทครุภัณฑ์": "เครื่องสายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "63สห99000045111000-05-3", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "63สห99000045111000-05-3", "ประเภทครุภัณฑ์": "แอมป์เสียง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "63สห99000045111000-05-3", "ประเภทครุภัณฑ์": "ไมค์ลอยRODE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "63สห99000045111000-05-3", "ประเภทครุภัณฑ์": "ไมค์สายSHURE", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "63สห99000045111000-05-3", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ลอยRODE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ปิดปรับปรุง", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "รายการครุภัณฑ์ ห้องคอมพิวเตอร์ 2 ชั้น 2 อาคาร A"}, {"ลำดับ": "ลำดับ", "เลขครุภัณฑ์": "เลขครุภัณฑ์", "ประเภทครุภัณฑ์": "ประเภทครุภัณฑ์", "จำนวน": "จำนวน", "ใช้ได้": "ใช้ได้", "ใช้งานไม่ได้": "ใช้งานไม่ได้", "ที่จัดเก็บ": "ที่จัดเก็บ", "หมายเหตุ": "หมายเหตุ"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045111000-05-4", "ประเภทครุภัณฑ์": "เครื่องสายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "63สห99000045111000-05-4", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "63สห99000045111000-05-4", "ประเภทครุภัณฑ์": "แอมป์เสียง", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "63สห99000045111000-05-4", "ประเภทครุภัณฑ์": "ไมค์ลอยRODE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "63สห99000045111000-05-4", "ประเภทครุภัณฑ์": "ไมค์สายSHURE", "จำนวน": "2", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "63สห99000045111000-05-4", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์ลอยRODE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "ปิดปรับปรุง", "จำนวน": "", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "สัมมนากลุ่มย่อย A201-A205": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1ห้อง1", "เลขครุภัณฑ์": "63สห99000045111000-05-1", "ประเภทครุภัณฑ์": "RODE(เครื่องรับสัญญาณไมค์ลอย)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-05-1", "ประเภทครุภัณฑ์": "TOAแอมป์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-05-1", "ประเภทครุภัณฑ์": "ไมค์ไร้สาย", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-05-1", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-05-1", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-05-1", "ประเภทครุภัณฑ์": "ตู้แร็ก", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2ห้อง2", "เลขครุภัณฑ์": "63สห99000045111000-10(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-10(1)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3ห้อง3", "เลขครุภัณฑ์": "63สห99000045111000-9(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-9(1)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4ห้อง4", "เลขครุภัณฑ์": "63สห99000045111000-8(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-8(1)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5ห้อง5", "เลขครุภัณฑ์": "63สห99000045111000-7(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "", "เลขครุภัณฑ์": "63สห99000045111000-7(1)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "ห้องบริการIMAC": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045111000-05-6", "ประเภทครุภัณฑ์": "RODE(เครื่องรับสัญญาณไมค์ลอย)", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "63สห99000045111000-05-6", "ประเภทครุภัณฑ์": "TOAแอมป์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "63สห99000045111000-05-6", "ประเภทครุภัณฑ์": "ไมค์ไร้สาย", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "63สห99000045111000-05-6", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "63สห99000045111000-05-6", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "63สห99000045111000-05-6", "ประเภทครุภัณฑ์": "ตู้แร็ก", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "63สห99000045111000-05-6", "ประเภทครุภัณฑ์": "ลำโพงเล็กติดผนัง", "จำนวน": "4", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "ห้องประชุม1-3": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045111000-11B5(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "52สห01042024000000-75(14)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "57สห990004511160001-02(1)", "ประเภทครุภัณฑ์": "เครื่องขยายเสียงไมค์ BOSCH", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "39สห5965-9-2-4", "ประเภทครุภัณฑ์": "เครื่องพาวเวอร์แอมป์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "39สห5965-9-2-5", "ประเภทครุภัณฑ์": "เครื่องพาวเวอร์แอมป์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "39สห5965-9-2-4", "ประเภทครุภัณฑ์": "เครื่องมิกเซอร์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "38สห5965-10-1-1(3)", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณไมค์ลอย", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "39สห5965-1-2-5", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณไมค์ลอย", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "39สห5965-2-2-9", "ประเภทครุภัณฑ์": "ลำโพงเล็ก", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "39สห5965-2-2-10", "ประเภทครุภัณฑ์": "ลำโพงเล็ก", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "11", "เลขครุภัณฑ์": "39สห5965-9-2-8", "ประเภทครุภัณฑ์": "ลำโพงเล็ก YAMAHA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "12", "เลขครุภัณฑ์": "57สห990004511160001-02(22)", "ประเภทครุภัณฑ์": "เครื่องรับสัญญาณไมค์ลอย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "13", "เลขครุภัณฑ์": "39สห5965-2-2-7", "ประเภทครุภัณฑ์": "ลำโพง RAMSA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "14", "เลขครุภัณฑ์": "39สห5965-2-2-8", "ประเภทครุภัณฑ์": "ลำโพง RAMSA", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "ห้อง2"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045111000-12(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์ SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "63สห99000045111000-12(2)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "ห้อง3"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "63สห99000045111000-13(1)", "ประเภทครุภัณฑ์": "เครื่องฉายโปรเจคเตอร์SONY", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "63สห99000045111000-13(2)", "ประเภทครุภัณฑ์": "จอ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "39สห5965-10-1-2", "ประเภทครุภัณฑ์": "ตัวรับสัญญาณไมค์", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}, "ห้องคาราโอเกะ1-4": {"headers": ["ลำดับ", "เลขครุภัณฑ์", "ประเภทครุภัณฑ์", "จำนวน", "ใช้ได้", "ใช้งานไม่ได้", "ที่จัดเก็บ", "หมายเหตุ"], "data": [{"ลำดับ": "1", "เลขครุภัณฑ์": "62สห01015681000000-01(21)", "ประเภทครุภัณฑ์": "ทีวี SAMSUNG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "62สห01015681000000-01(1).1", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "62สห01015681000000-01(1).2", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "62สห01015681000000-01(17)", "ประเภทครุภัณฑ์": "เครื่อง PC acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "62สห01015681000000-01(5)", "ประเภทครุภัณฑ์": "เครื่องแอมป์เสียง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "62สห01015681000000-01(9)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "62สห01015681000000-01(10)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "คีร์บอร์ด acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "เมาส์ไร้สาย", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "10", "เลขครุภัณฑ์": "58สห01042024000000-18(2)", "ประเภทครุภัณฑ์": "เครื่องสำรองไฟ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "ห้อง2"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "62สห01015681000000-01(22)", "ประเภทครุภัณฑ์": "ทีวี SAMSUNG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "62สห01015681000000-01(2).1", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "62สห01015681000000-01(2).2", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "62สห01015681000000-01(18)", "ประเภทครุภัณฑ์": "เครื่อง PC acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "62สห01015681000000-01(6)", "ประเภทครุภัณฑ์": "เครื่องแอมป์เสียง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "62สห01015681000000-01(11)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "62สห01015681000000-01(12)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "คีร์บอร์ด acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "57สห01042024000000-40(2)", "ประเภทครุภัณฑ์": "เครื่องสำรองไฟ", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "ห้อง3"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "62สห01015681000000-01(23)", "ประเภทครุภัณฑ์": "ทีวี SAMSUNG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "62สห01015681000000-01(3).1", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "62สห01015681000000-01(3).2", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "62สห01015681000000-01(19)", "ประเภทครุภัณฑ์": "เครื่อง PC acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "62สห01015681000000-01(7)", "ประเภทครุภัณฑ์": "เครื่องแอมป์เสียง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "62สห01015681000000-01(13)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "62สห01015681000000-01(14)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "คีร์บอร์ด acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"_type": "category", "title": "ห้อง4"}, {"ลำดับ": "1", "เลขครุภัณฑ์": "62สห01015681000000-01(24)", "ประเภทครุภัณฑ์": "ทีวี SAMSUNG", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "2", "เลขครุภัณฑ์": "62สห01015681000000-01(4).1", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "3", "เลขครุภัณฑ์": "62สห01015681000000-01(4).2", "ประเภทครุภัณฑ์": "ลำโพง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "4", "เลขครุภัณฑ์": "62สห01015681000000-01(20)", "ประเภทครุภัณฑ์": "เครื่อง PC acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "5", "เลขครุภัณฑ์": "62สห01015681000000-01(8)", "ประเภทครุภัณฑ์": "เครื่องแอมป์เสียง JBL", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "6", "เลขครุภัณฑ์": "62สห01015681000000-01(15)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "7", "เลขครุภัณฑ์": "62สห01015681000000-01(16)", "ประเภทครุภัณฑ์": "ไมค์สาย SHURE", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "8", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "คีร์บอร์ด acer", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}, {"ลำดับ": "9", "เลขครุภัณฑ์": "", "ประเภทครุภัณฑ์": "เมาส์ไร้สาย", "จำนวน": "1", "ใช้ได้": "", "ใช้งานไม่ได้": "", "ที่จัดเก็บ": "", "หมายเหตุ": ""}]}};
+
+    // Local Variables
+    let currentDb = {};
+    let activeSheet = "";
+    let activeFilter = "all"; // all, over10, broken, working
+    
+    // IndexedDB Config
+    const dbName = "KLLC_Survey_Standalone_DB";
+    const storeName = "survey_records";
+    const imageStoreName = "survey_images";
+
+    // Initialize Database
+    async function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(storeName)) {
+            db.createObjectStore(storeName);
+          }
+          if (!db.objectStoreNames.contains(imageStoreName)) {
+            db.createObjectStore(imageStoreName);
+          }
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function loadData() {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(storeName, "readonly");
+        const store = tx.objectStore(storeName);
+        
+        return new Promise((resolve) => {
+          const req = store.get("kllc_records_data");
+          req.onsuccess = () => {
+            if (req.result) {
+              currentDb = req.result;
+            } else {
+              currentDb = JSON.parse(JSON.stringify(INITIAL_DB));
+            }
+            resolve();
+          };
+        });
+      } catch (err) {
+        currentDb = JSON.parse(JSON.stringify(INITIAL_DB));
+      }
+    }
+
+    async function persistData() {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(storeName, "readwrite");
+        const store = tx.objectStore(storeName);
+        store.put(currentDb, "kllc_records_data");
+      } catch (err) {
+        console.error("Failed to save to IndexedDB.", err);
+      }
+    }
+
+    // Save Image to DB
+    async function saveImage(recordKey, base64Data) {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(imageStoreName, "readwrite");
+        const store = tx.objectStore(imageStoreName);
+        await new Promise((resolve, reject) => {
+          const req = store.put(base64Data, recordKey);
+          req.onsuccess = () => resolve();
+          req.onerror = () => reject(req.error);
+        });
+      } catch (err) {
+        console.error("Failed to save image.", err);
+      }
+    }
+
+    // Get Image from DB
+    async function getImage(recordKey) {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(imageStoreName, "readonly");
+        const store = tx.objectStore(imageStoreName);
+        return new Promise((resolve) => {
+          const req = store.get(recordKey);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve(null);
+        });
+      } catch (err) {
+        return null;
+      }
+    }
+
+    // Delete Image from DB
+    async function deleteImage(recordKey) {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(imageStoreName, "readwrite");
+        const store = tx.objectStore(imageStoreName);
+        store.delete(recordKey);
+      } catch (err) {}
+    }
+
+    // Dynamic Asset Age Calculator based on Thai B.E. Format
+    // Thai year 2569 B.E. corresponds to current local year 2026 A.D.
+    function getAssetAgeInfo(assetId) {
+      if (!assetId) return null;
+      // Search for the first two-digit number in the string (represents B.E. short year, e.g. 57, 63, 68)
+      const match = assetId.match(/(\d{2})/);
+      if (match) {
+        const yrShort = parseInt(match[1]);
+        if (yrShort > 0) {
+          // Generally B.E. years are in the range 2500+ (e.g. 57 -> 2557)
+          // For older assets, could be 24xx or we handle cases
+          let beYear = (yrShort >= 30 && yrShort <= 99) ? (2500 + yrShort) : (2500 + yrShort);
+          if (yrShort < 30) {
+            beYear = 2500 + yrShort; // e.g. 10 -> 2510, or 2569
+          }
+          const currentBeYear = 2569; // Year 2026 is B.E. 2569
+          const age = currentBeYear - beYear;
+          return {
+            beYear: beYear,
+            age: age
+          };
+        }
+      }
+      return null;
+    }
+
+    // Render Navigation tabs
+    function renderTabs() {
+      const container = document.getElementById("tabsContainer");
+      container.innerHTML = "";
+      
+      Object.keys(currentDb).forEach((sheetName, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "tab-btn" + (activeSheet === sheetName ? " active" : "");
+        
+        let iconClass = "fa-solid fa-list-check";
+        if (sheetName === "สรุป") iconClass = "fa-solid fa-chart-pie";
+        else if (sheetName.includes("คอมฯ")) iconClass = "fa-solid fa-desktop";
+        else if (sheetName.includes("CCTV")) iconClass = "fa-solid fa-video";
+        else if (sheetName.includes("ชุดเครื่องเสียง")) iconClass = "fa-solid fa-sliders";
+        else if (sheetName.includes("จอ VDW")) iconClass = "fa-solid fa-tv";
+        else if (sheetName.includes("ห้องประชุม")) iconClass = "fa-solid fa-briefcase";
+        else if (sheetName.includes("คาราโอเกะ")) iconClass = "fa-solid fa-microphone";
+        
+        btn.innerHTML = `<i class="${iconClass}"></i> ${sheetName}`;
+        btn.onclick = () => selectTab(sheetName);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectTab(sheetName) {
+      activeSheet = sheetName;
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        if (btn.textContent.trim() === sheetName) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+      
+      document.getElementById("sheetSearch").value = "";
+      setQuickFilter("all");
+    }
+
+    function setQuickFilter(mode) {
+      activeFilter = mode;
+      
+      // Update active state on filter buttons
+      document.querySelectorAll(".quick-filters .btn").forEach(btn => {
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-secondary");
+      });
+      
+      const activeBtn = document.getElementById(`f-${mode}`);
+      if (activeBtn) {
+        activeBtn.classList.remove("btn-secondary");
+        activeBtn.classList.add("btn-primary");
+      }
+      
+      renderActiveSheet();
+    }
+
+    // Helper to toggle status directly on click
+    async function toggleRowStatus(rIdx, currentStatusField, val) {
+      const sheet = currentDb[activeSheet];
+      const record = sheet.data[rIdx];
+      
+      let nextStatus = "";
+      if (val === "ใช้งานได้" || val === "ใช้ได้" || val === "1" || val === "OK") {
+        nextStatus = "ใช้งานไม่ได้";
+      } else {
+        nextStatus = "ใช้งานได้";
+      }
+      
+      record[currentStatusField] = nextStatus;
+      await persistData();
+      renderActiveSheet();
+    }
+
+    // Render Active Sheet Panel
+    async function renderActiveSheet() {
+      const sheet = currentDb[activeSheet];
+      if (!sheet) return;
+      
+      document.getElementById("activeTitle").innerHTML = `<i class="fa-solid fa-folder-open"></i> ${activeSheet}`;
+      
+      const searchTerm = document.getElementById("sheetSearch").value.trim().toLowerCase();
+      const headers = sheet.headers;
+      
+      // 1. First Pass: Filter by search and quick filters
+      let rows = sheet.data;
+      
+      // Filter out empty rows or non-objects
+      rows = rows.filter(r => r && (r._type === "category" || typeof r === "object"));
+      
+      // Apply Search Filter
+      if (searchTerm) {
+        rows = rows.filter(r => {
+          if (r._type === "category") return false;
+          return Object.values(r).some(v => String(v).toLowerCase().includes(searchTerm));
+        });
+      }
+      
+      // Apply Quick Filter (over10, broken, working)
+      if (activeFilter === "over10") {
+        rows = rows.filter(r => {
+          if (r._type === "category") return false;
+          const ageInfo = getAssetAgeInfo(r["เลขครุภัณฑ์"]);
+          return ageInfo && ageInfo.age >= 10;
+        });
+      } else if (activeFilter === "broken") {
+        rows = rows.filter(r => {
+          if (r._type === "category") return false;
+          return Object.keys(r).some(k => {
+            if (k === "ใช้งานไม่ได้" || k === "ใช้งานไม่ได้" || k === "ใช้ไม่ได้") {
+              return r[k] === "ใช้งานไม่ได้" || r[k] === "0" || r[k] === "ชำรุด";
+            }
+            return false;
+          }) || r["ใช้งานไม่ได้"] === "ใช้งานไม่ได้" || r["ใช้ได้"] === "ใช้งานไม่ได้";
+        });
+      } else if (activeFilter === "working") {
+        rows = rows.filter(r => {
+          if (r._type === "category") return false;
+          return Object.keys(r).some(k => {
+            if (k === "ใช้งานได้" || k === "ใช้ได้") {
+              return r[k] === "ใช้งานได้" || r[k] === "ใช้ได้" || r[k] === "1" || r[k] === "OK";
+            }
+            return false;
+          });
+        });
+      }
+      
+      // Render Summary Dashboard Grid Metrics
+      calculateGlobalStats();
+      
+      // Render Table
+      const container = document.getElementById("activeTableContainer");
+      if (rows.length === 0) {
+        container.innerHTML = `<div class="empty"><i class="fa-regular fa-face-frown"></i> ไม่พบข้อมูลที่ตรงกับเงื่อนไข</div>`;
+        return;
+      }
+      
+      // Re-order headers to place Asset ID, Type, Qty first, and Age column
+      let tableHtml = `<table><thead><tr>`;
+      headers.forEach(h => {
+        tableHtml += `<th>${h}</th>`;
+      });
+      tableHtml += `<th>อายุใช้งาน</th>`;
+      tableHtml += `<th>ภาพถ่าย</th>`;
+      tableHtml += `<th>จัดการ</th>`;
+      tableHtml += `</tr></thead><tbody>`;
+      
+      for (let rIdx = 0; rIdx < rows.length; rIdx++) {
+        const row = rows[rIdx];
+        
+        if (row._type === "category") {
+          tableHtml += `<tr class="row-category"><td colspan="${headers.length + 3}">${row.title}</td></tr>`;
+          continue;
+        }
+        
+        tableHtml += `<tr>`;
+        headers.forEach(h => {
+          let val = row[h] || "";
+          
+          // Render Status badges with instant click toggle
+          if (h === "ใช้งานได้" || h === "ใช้ได้" || h === "ใช้งานไม่ได้" || h.includes("สถานะ")) {
+            let working = (val === "ใช้งานได้" || val === "ใช้ได้" || val === "1" || val === "OK");
+            let broken = (val === "ใช้งานไม่ได้" || val === "0" || val === "ชำรุด");
+            if (working) {
+              tableHtml += `<td><span class="status-badge status-working" onclick="toggleRowStatus(${rIdx}, '${h}', '${val}')" title="คลิกเพื่อสลับสถานะ"><i class="fa-solid fa-circle-check"></i> ใช้งานได้</span></td>`;
+            } else if (broken) {
+              tableHtml += `<td><span class="status-badge status-broken" onclick="toggleRowStatus(${rIdx}, '${h}', '${val}')" title="คลิกเพื่อสลับสถานะ"><i class="fa-solid fa-circle-xmark"></i> ชำรุด</span></td>`;
+            } else {
+              tableHtml += `<td>${val}</td>`;
+            }
+          } else if (h === "เลขครุภัณฑ์") {
+            tableHtml += `<td><code style="color:#58a6ff; font-weight:600; font-size:0.85rem;">${val}</code></td>`;
+          } else {
+            tableHtml += `<td>${val}</td>`;
+          }
+        });
+        
+        // Age calculation column
+        const ageInfo = getAssetAgeInfo(row["เลขครุภัณฑ์"]);
+        let ageHtml = `<td>—</td>`;
+        if (ageInfo) {
+          if (ageInfo.age >= 10) {
+            ageHtml = `<td><span class="age-badge age-over10"><i class="fa-solid fa-triangle-exclamation"></i> ${ageInfo.age} ปี (ปี ${ageInfo.beYear})</span></td>`;
+          } else if (ageInfo.age >= 5) {
+            ageHtml = `<td><span class="age-badge age-mid"><i class="fa-solid fa-clock"></i> ${ageInfo.age} ปี (ปี ${ageInfo.beYear})</span></td>`;
+          } else {
+            ageHtml = `<td><span class="age-badge age-new"><i class="fa-solid fa-face-smile"></i> ${ageInfo.age} ปี (ปี ${ageInfo.beYear})</span></td>`;
+          }
+        }
+        tableHtml += ageHtml;
+        
+        // Image Cell with uploader preview
+        const recordKey = `${activeSheet}_${row["ลำดับ"] || rIdx}_${row["เลขครุภัณฑ์"] || ""}`;
+        const storedImg = await getImage(recordKey);
+        
+        let imgHtml = ``;
+        if (storedImg) {
+          imgHtml = `
+            <div class="image-cell-wrapper">
+              <img class="thumbnail-preview" src="${storedImg}" onclick="openLightbox('${storedImg}')">
+              <button class="btn-icon" onclick="removeRowImage('${recordKey}')" title="ลบรูป"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `;
+        } else {
+          imgHtml = `
+            <button class="btn-icon" onclick="triggerImageUpload('${recordKey}')" title="อัพโหลดรูปภาพ"><i class="fa-solid fa-cloud-arrow-up"></i></button>
+            <input type="file" id="file_${recordKey}" style="display:none;" accept="image/*" onchange="uploadRowImage(event, '${recordKey}')">
+          `;
+        }
+        tableHtml += `<td>${imgHtml}</td>`;
+        
+        // Actions cell
+        tableHtml += `<td>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="openEditModal(${rIdx})"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+            <button class="btn btn-danger" style="padding: 4px 8px;" onclick="deleteRecord(${rIdx})"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>`;
+        tableHtml += `</tr>`;
+      }
+      
+      tableHtml += `</tbody></table>`;
+      container.innerHTML = tableHtml;
+      
+      updateStats(rows);
+    }
+
+    // Calculate Global Metrics for Dashboard Boxes
+    function calculateGlobalStats() {
+      let totalCount = 0;
+      let workingCount = 0;
+      let brokenCount = 0;
+      let over10Count = 0;
+      
+      Object.keys(currentDb).forEach(sheetName => {
+        const rows = currentDb[sheetName].data || [];
+        rows.forEach(r => {
+          if (!r || r._type === "category") return;
+          totalCount++;
+          
+          // Age calc
+          const ageInfo = getAssetAgeInfo(r["เลขครุภัณฑ์"]);
+          if (ageInfo && ageInfo.age >= 10) {
+            over10Count++;
+          }
+          
+          // Status calc
+          Object.keys(r).forEach(k => {
+            if (k === "ใช้งานได้" || k === "ใช้ได้") {
+              if (r[k] === "ใช้งานได้" || r[k] === "ใช้ได้" || r[k] === "1" || r[k] === "OK") workingCount++;
+              if (r[k] === "ใช้งานไม่ได้" || r[k] === "0" || r[k] === "ชำรุด") brokenCount++;
+            }
+          });
+        });
+      });
+      
+      const grid = document.getElementById("summaryGrid");
+      grid.innerHTML = `
+        <div class="summary-box">
+          <div class="summary-icon" style="background:var(--color-primary-glow); color:var(--color-primary);"><i class="fa-solid fa-boxes-stacked"></i></div>
+          <div class="summary-info">
+            <h3>ครุภัณฑ์ทั้งหมด</h3>
+            <div class="val">${totalCount} รายการ</div>
+          </div>
+        </div>
+        <div class="summary-box" style="border-color: rgba(239, 68, 68, 0.35);">
+          <div class="summary-icon" style="background:rgba(239,68,68,0.15); color:hsl(355, 90%, 62%);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="summary-info">
+            <h3>หมดอายุ (เกิน 10 ปี)</h3>
+            <div class="val" style="color:#ff6b6b;">${over10Count} รายการ</div>
+          </div>
+        </div>
+        <div class="summary-box" style="border-color: rgba(217, 119, 6, 0.3);">
+          <div class="summary-icon" style="background:rgba(217,119,6,0.15); color:#f59e0b;"><i class="fa-solid fa-circle-exmark"></i></div>
+          <div class="summary-info">
+            <h3>ชำรุด (ต้องซ่อมแซม)</h3>
+            <div class="val" style="color:#f59e0b;">${brokenCount} รายการ</div>
+          </div>
+        </div>
+        <div class="summary-box" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div class="summary-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="summary-info">
+            <h3>พร้อมใช้งานปกติ</h3>
+            <div class="val" style="color:#10b981;">${workingCount} รายการ</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Dynamic counters bar
+    function updateStats(rows) {
+      const bar = document.getElementById("activeCounters");
+      bar.innerHTML = "";
+      
+      const normalRows = rows.filter(r => r && r._type !== "category");
+      const total = normalRows.length;
+      
+      let working = 0;
+      let broken = 0;
+      let over10 = 0;
+      
+      normalRows.forEach(r => {
+        // Status Check
+        Object.keys(r).forEach(k => {
+          if (k === "ใช้งานได้" || k === "ใช้ได้") {
+            if (r[k] === "ใช้งานได้" || r[k] === "ใช้ได้" || r[k] === "1" || r[k] === "OK") working++;
+            if (r[k] === "ใช้งานไม่ได้" || r[k] === "0" || r[k] === "ชำรุด") broken++;
+          }
+        });
+        
+        // Age Check
+        const ageInfo = getAssetAgeInfo(r["เลขครุภัณฑ์"]);
+        if (ageInfo && ageInfo.age >= 10) over10++;
+      });
+      
+      let html = `
+        <span class="chip"><i class="fa-solid fa-table-list"></i> ในหน้านี้: ${total} แถว</span>
+      `;
+      if (working > 0) {
+        html += `<span class="chip" style="color:#3fb950; border-color:rgba(63, 185, 80, 0.35);"><i class="fa-solid fa-circle-check"></i> ใช้ได้: ${working}</span>`;
+      }
+      if (broken > 0) {
+        html += `<span class="chip" style="color:#f85149; border-color:rgba(248, 81, 73, 0.35);"><i class="fa-solid fa-circle-xmark"></i> ชำรุด: ${broken}</span>`;
+      }
+      if (over10 > 0) {
+        html += `<span class="chip" style="color:#ff6b6b; border-color:rgba(248, 81, 73, 0.35);"><i class="fa-solid fa-triangle-exclamation"></i> เสื่อมสภาพ (>10 ปี): ${over10}</span>`;
+      }
+      bar.innerHTML = html;
+    }
+
+    function handleSearch() {
+      renderActiveSheet();
+    }
+
+    // IMAGE UPLOAD IMPLEMENTATION
+    function triggerImageUpload(recordKey) {
+      document.getElementById(`file_${recordKey}`).click();
+    }
+
+    function uploadRowImage(e, recordKey) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = async function(evt) {
+        const base64 = evt.target.result;
+        await saveImage(recordKey, base64);
+        renderActiveSheet();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function removeRowImage(recordKey) {
+      if (confirm("ต้องการลบภาพนี้ใช่หรือไม่?")) {
+        await deleteImage(recordKey);
+        renderActiveSheet();
+      }
+    }
+
+    // LIGHTBOX
+    function openLightbox(src) {
+      const lightbox = document.getElementById("lightbox");
+      document.getElementById("lightboxImg").src = src;
+      lightbox.classList.add("show");
+    }
+
+    // EDIT RECORD MODAL
+    let currentEditIndex = -1;
+    let isNewRecord = false;
+
+    function openEditModal(rIdx) {
+      isNewRecord = false;
+      currentEditIndex = rIdx;
+      
+      const sheet = currentDb[activeSheet];
+      const record = sheet.data[rIdx];
+      const headers = sheet.headers;
+      
+      document.getElementById("modalTitle").innerHTML = `<i class="fa-solid fa-pen-to-square"></i> แก้ไขข้อมูลครุภัณฑ์`;
+      
+      let formHtml = ``;
+      headers.forEach(h => {
+        let val = record[h] || "";
+        formHtml += `
+          <div class="form-group">
+            <label>${h}</label>
+            <input type="text" id="form_${h}" class="form-control" value="${val.replace(/"/g, '&quot;')}">
+          </div>
+        `;
+      });
+      
+      document.getElementById("modalFormContent").innerHTML = formHtml;
+      document.getElementById("editModal").classList.add("show");
+    }
+
+    function openAddModal() {
+      isNewRecord = true;
+      currentEditIndex = -1;
+      
+      const sheet = currentDb[activeSheet];
+      const headers = sheet.headers;
+      
+      document.getElementById("modalTitle").innerHTML = `<i class="fa-solid fa-plus"></i> เพิ่มครุภัณฑ์ใหม่`;
+      
+      let formHtml = ``;
+      headers.forEach(h => {
+        formHtml += `
+          <div class="form-group">
+            <label>${h}</label>
+            <input type="text" id="form_${h}" class="form-control" value="">
+          </div>
+        `;
+      });
+      
+      document.getElementById("modalFormContent").innerHTML = formHtml;
+      document.getElementById("editModal").classList.add("show");
+    }
+
+    function closeModal() {
+      document.getElementById("editModal").classList.remove("show");
+    }
+
+    async function saveRecord() {
+      const sheet = currentDb[activeSheet];
+      const headers = sheet.headers;
+      
+      let updatedRecord = {};
+      headers.forEach(h => {
+        updatedRecord[h] = document.getElementById(`form_${h}`).value;
+      });
+      
+      if (isNewRecord) {
+        sheet.data.push(updatedRecord);
+      } else {
+        sheet.data[currentEditIndex] = updatedRecord;
+      }
+      
+      await persistData();
+      closeModal();
+      renderActiveSheet();
+    }
+
+    async function deleteRecord(rIdx) {
+      if (confirm("คุณแน่ใจว่าต้องการลบแถวครุภัณฑ์นี้ใช่หรือไม่?")) {
+        const sheet = currentDb[activeSheet];
+        const record = sheet.data[rIdx];
+        const recordKey = `${activeSheet}_${record["ลำดับ"] || rIdx}_${record["เลขครุภัณฑ์"] || ""}`;
+        await deleteImage(recordKey);
+        
+        sheet.data.splice(rIdx, 1);
+        await persistData();
+        renderActiveSheet();
+      }
+    }
+
+    // EXPORT DATABASE TO JSON
+    function exportFullJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentDb, null, 2));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "kllc_survey_inventory_records.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // RESET TO DEFAULTS
+    async function resetToInitial() {
+      if (confirm("คำเตือน: คุณต้องการลบการแก้ไขทั้งหมดและรีเซ็ตค่าเป็นค่าดั้งเดิมจากสเปรดชีตใช่หรือไม่?")) {
+        currentDb = JSON.parse(JSON.stringify(INITIAL_DB));
+        await persistData();
+        
+        // Clear images
+        const db = await initDB();
+        const tx = db.transaction(imageStoreName, "readwrite");
+        tx.objectStore(imageStoreName).clear();
+        
+        selectTab(Object.keys(currentDb)[0]);
+      }
+    }
+
+    // Start App
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadData();
+      activeSheet = Object.keys(currentDb)[0] || "";
+      renderTabs();
+      if (activeSheet) {
+        selectTab(activeSheet);
+      }
+    });
+  </script>
+</body>
+</html>
